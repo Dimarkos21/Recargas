@@ -27,11 +27,12 @@ const session = require('express-session');
 // 1. CONFIGURACIÓN DE SESIONES (Obligatorio antes de Passport)
 // ==========================================
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'un_secreto_super_seguro_para_tu_sesion',
+    secret: process.env.SESSION_SECRET ,
     resave: false,
     saveUninitialized: false,
     // Nota para producción (2026): si usas HTTPS real, añade: cookie: { secure: true }
 }));
+
 
 // ==========================================
 // 2. INICIALIZACIÓN DE PASSPORT
@@ -42,7 +43,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET ,
-    callbackURL: 'http://localhost:3006/auth/google/callback'
+    callbackURL: '/auth/google/callback'
   },
  async function(accessToken, refreshToken, profile, cb) {
     try {
@@ -144,6 +145,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 
 // Controladores
+const obtenerTasaP2P = require("../RecargasJuegos/controllers/P2P");
 const usersRouter = require('./controllers/users');
 const loginRouter = require('./controllers/login');
 const todosRouter = require('./controllers/todos');
@@ -157,7 +159,7 @@ const HistorialRouter = require("./controllers/historial");
 const statsRouter = require('./controllers/estadisticas'); 
 const statsMiddleware = require("./middleware/statsMiddleware"); 
 const PresupuestoRouter = require('./controllers/presupuesto');
-const ControlRouter = require('./controllers/control_gatos');
+
 const ProductoAgregarRouter = require('./controllers/productosAgregar');
 const NegocioRouter = require("./controllers/negocio");
 const { auditMiddleware } = require('./middleware/setAuditContext');
@@ -166,11 +168,11 @@ const ProveedorRouter = require('./controllers/Proveedor');
 const {checkSubscription} = require("./middleware/Mensualida");
 
  const NegociosControlRouter = require("./AdminControllers/Negocios");
- const { obtenerTasaBCV } = require('./controllers/BCV');
+
 const pedidosRouter = require('./controllers/Pedidos');
 const clientesRouter = require('./controllers/clientes');
 const SucusalesRouter = require('./controllers/sucursales');
-const CajaDiaRouter   = require('./controllers/CajaDia');
+const CajaDiaRouter   = require('./controllers/P2P');
 const GamesRouter = require('./controllers/Games'); // Asegúrate de que este archivo exista
 // Nueva ruta  para DeudasTotales
 const DeudasTotalesRouter = require('./controllers/DeudasTotales'); // Asegúrate de que este archivo exista
@@ -453,10 +455,10 @@ app.use('/api/sucursales', userExtractor,checkSubscription, SucusalesRouter);
 app.use('/api/configuracion', userExtractor, checkSubscription,configuracionRouter);
 
 app.use('/api/pedidos', userExtractor, pedidosRouter, );
-app.use('/api/stats', userExtractor, checkSubscription, statsRouter);
-app.use('/api/control_gatos', userExtractor,checkSubscription, ControlRouter);
-app.use('/api/negocios', userExtractor,checkSubscription, NegocioRouter);
-app.get('/api/tasaBCV', obtenerTasaBCV );
+
+
+
+app.get('/api/tasaP2P', obtenerTasaP2P);
 // --- FILTRO DE SEGURIDAD (Protección de código fuente) ---
 // Rutas ApI BACKEND ADMIN 
 app.use('/api/negociosControl', userExtractor,    NegociosControlRouter );

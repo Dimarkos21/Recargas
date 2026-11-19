@@ -10,6 +10,8 @@ const Billetera_Model = require('../models/Billetera');
 const Producto_Model = require('../models/Product');
 const Trasferencia_Model = require('../models/PagoModel');
 const {userExtractor} = require("../middleware/auth");
+const Tasa = require("../models/tasap2p"); // Ajusta la ruta a tu modelo
+
 // Ruta para manejar las solicitudes GET a /api/todos
 GamesRouter.get("/", async (request, response) => {
     try {
@@ -47,9 +49,14 @@ function CalculoComisionConIvaReal(costoUsdt, gananciaPct, tasaP2p, comisionPasa
     return Number(precioFinalBs.toFixed(2));
 }
 // BINANCE TASA P2P 
+
+
 let ultimaTasaAltaConocida = null;
 
-async function obtenerTasaBinanceAlta() {
+
+
+// 1. Consulta Binance P2P y sus respaldos
+async function consultarTasaExterna() {
     const TIMEOUT_MS = 3500;
 
     async function fetchConTimeout(url, options = {}, timeoutMs = TIMEOUT_MS) {
@@ -119,7 +126,7 @@ async function obtenerTasaBinanceAlta() {
         console.warn("Fallo en Binance P2P, probando respaldo 1:", error.message);
     }
 
-    // 2. Respaldo 1: Cotizave (ajusta endpoint/clave si tu cuenta la requiere)
+    // 2. Respaldo 1: Cotizave
     try {
         const url = "https://cotizave.com/v2/fx/VE/rates";
         const response = await fetchConTimeout(url, {
@@ -147,7 +154,7 @@ async function obtenerTasaBinanceAlta() {
         console.warn("Fallo en respaldo 1, probando respaldo 2:", error.message);
     }
 
-    // 3. Respaldo 2: Segunda API alternativa USDT/VES (reemplaza por tu URL real)
+    // 3. Respaldo 2: Segunda API alternativa USDT/VES
     try {
         const url = "https://api.respaldo-usdt-ves.ejemplo/v1/high-rate";
         const response = await fetchConTimeout(url, {
@@ -171,7 +178,7 @@ async function obtenerTasaBinanceAlta() {
         console.warn("Fallo en respaldo 2, probando respaldo 3 (caché):", error.message);
     }
 
-    // 4. Respaldo 3: Última tasa alta conocida en memoria
+    // 4. Respaldo 3: Última tasa conocida en memoria
     if (Number.isFinite(ultimaTasaAltaConocida) && ultimaTasaAltaConocida > 0) {
         return ultimaTasaAltaConocida;
     }
@@ -179,6 +186,87 @@ async function obtenerTasaBinanceAlta() {
     console.error("Error consultando Binance y todos los respaldos fallaron.");
     return null;
 }
+
+// 2. Vigilante que guarda la tasa en MongoDB cada 5 minutos
+const iniciarVigilanteTasaP2P = () => {
+    if (typeof esWorkerPrincipal === 'function' && !esWorkerPrincipal()) return;
+
+    const INTERVALO_MS = 5 * 60 * 1000; // 5 minutos
+    let ejecutando = false;
+
+    const actualizarEnMongo = async () => {
+        if (ejecutando) return;
+        ejecutando = true;
+
+        try {
+            const nuevaTasa = await consultarTasaExterna();
+            if (!Number.isFinite(nuevaTasa) || nuevaTasa <= 0) return;
+
+            await Tasa.findOneAndUpdate(
+                { nombre: "P2P" },
+                {
+                    $set: {
+                        valor: nuevaTasa,
+                        ultimaActualizacion: new Date()
+                    }
+                },
+                { upsert: true, new: true }
+            );
+
+            ultimaTasaAltaConocida = nuevaTasa;
+        } catch (error) {
+            console.error("❌ Error guardando tasa P2P en MongoDB:", error.message);
+        } finally {
+            ejecutando = false;
+        }
+    };
+
+    actualizarEnMongo(); // Primera carga al iniciar
+    const intervalo = setInterval(actualizarEnMongo, INTERVALO_MS);
+    intervalo.unref();
+};
+
+// 3. Función principal: devuelve el valor guardado en MongoDB
+async function obtenerTasaBinanceAlta() {
+    try {
+        const registro = await Tasa.findOne({ nombre: "P2P" }).lean();
+
+        if (registro && Number.isFinite(registro.valor) && registro.valor > 0) {
+            ultimaTasaAltaConocida = registro.valor;
+            return registro.valor;
+        }
+
+        // Si es la primera vez y aún no hay documento en MongoDB, consulta y guarda una vez
+        const tasaInicial = await consultarTasaExterna();
+        if (Number.isFinite(tasaInicial) && tasaInicial > 0) {
+            await Tasa.findOneAndUpdate(
+                { nombre: "P2P" },
+                {
+                    $set: {
+                        valor: tasaInicial,
+                        ultimaActualizacion: new Date()
+                    }
+                },
+                { upsert: true, new: true }
+            );
+            return tasaInicial;
+        }
+    } catch (error) {
+        console.warn("⚠️ Error leyendo tasa P2P de MongoDB, usando respaldo en memoria:", error.message);
+    }
+
+    // Respaldo de emergencia si MongoDB sufre un corte temporal
+    if (Number.isFinite(ultimaTasaAltaConocida) && ultimaTasaAltaConocida > 0) {
+        return ultimaTasaAltaConocida;
+    }
+
+    return null;
+}
+
+
+
+
+
 
 // Ruta para manejar las solicitudes GET a /api/todos/:id
 // Ruta para buscar un juego específico por su nombre
@@ -1802,7 +1890,7 @@ const iniciarVigilantePendientesR4 = () => {
 const iniciarVigilanteOrdenesProveedor = () => {
     if (!esWorkerPrincipal()) return;
 
-    const INTERVALO_MS = 60 * 1000;
+    const INTERVALO_MS = 6 * 60 * 1000;
     let ejecutando = false;
 
     const intervalo = setInterval(async () => {
@@ -1938,6 +2026,6 @@ const iniciarVigilanteOrdenesProveedor = () => {
 };
 
 iniciarVigilantePendientesR4();
-iniciarVigilanteOrdenesProveedor();
+iniciarVigilanteOrdenesProveedor();iniciarVigilanteTasaP2P()
 
 module.exports = GamesRouter;
