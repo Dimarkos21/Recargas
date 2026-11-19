@@ -1,0 +1,356 @@
+<html>
+    <head>
+            <link rel='stylesheet' type='text/css' media='screen' href='index.css'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="../axiosStatus.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../img/icon.png">
+    </head>
+
+    <body>
+      <nav id="barra-navegacion">
+                        
+           
+            <div id="barra">
+
+                
+            <div id="menu-navegacion">
+                <div id="c">
+                    <ul id="menu-desplegable" class="visible">
+                        
+                            <li id="menu">
+                           
+ <!-- menu desplegable Casa, registro-->
+ <div id="contenido-menu"> 
+    <div class="container-menu" >
+   
+
+  <!--  home!-->
+<button id="Home-btn" class="btn"> 
+    
+    
+        <lord-icon
+    src="https://cdn.lordicon.com/jeuxydnh.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            <p id="menu-text">Casa</p>
+        </button>
+        </div>
+        <div class="container-menu" >
+      
+        </div>
+
+         <!--  Historial e!-->
+   <div class="container-menu" >
+                <button id="mensaje-historial" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                  <lord-icon
+            src="https://cdn.lordicon.com/dafdkyyt.json"
+            trigger="hover"
+            style="width:30px;height:30px">
+        </lord-icon>
+            
+                <p id="menu-text">    Historial</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  registro e!-->
+            <div class="container-menu" >
+                <button id="Registro-btn" class="btn"> 
+                    <lord-icon
+                    src="https://cdn.lordicon.com/mqgegihh.json"
+                    trigger="hover"
+                    style="width:30px ;height:30px">
+                 
+                </lord-icon>
+               
+              
+                <p id="menu-text">Registro</p>
+                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            </button>
+            </div>
+
+
+  <!--  mensaje! -->
+            <div class="container-menu" >
+                <button id="producto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/jprtoagx.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Productos</p>
+
+               
+                  
+            </button>
+            </div>
+
+ <div class="container-menu" >
+                <button id="Presupuesto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/cfkiwvcc.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Presupuesto</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  afacturacion! -->
+
+            <div class="container-menu" >
+                <button id="mensaje-btn" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/ytklkgsc.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">    Facturacion</p>
+
+               
+                  
+            </button>
+            </div>
+            
+              <!-- control de gastos! -->
+         
+                <div class="container-menu" >
+                <button id="Pedidos-btn" class="btn"> 
+
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/rezibkiy.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text"> Pedidos</p>
+
+               
+                  
+            </button>
+            </div>
+          
+  <!-- config! -->
+   <div class="container-menu" >
+                <button id="administrador-btn" class="btn"> 
+                 
+         <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                <p id="menu-text">Administrador</p>
+
+               
+                  
+            </button>
+            </div>
+            
+            <div class="container-menu" >
+                <button id="config-btn" class="btn"> 
+                 
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                       
+                   
+                <p id="menu-text">Configuracion</p>
+
+               
+                  
+            </button>
+            </div>
+           
+          
+ </div>
+                       
+                    </li>
+                      
+
+                    <div id="soporte">
+                
+                    </div>
+                    </ul>     
+                </div>
+            
+                
+                <button id="boton-menu">
+                    <svg  xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+               <h1 id="inventary" >OptiGest</h1>
+                </button>
+                
+               </div>
+               
+            <div id="contenedor">
+                <h1 id="Inventarioss"> OptiGest</h1>
+
+            </div>
+        </div>
+ 
+
+
+    </div>
+         <!-- Botón que activa la ventana -->
+
+  
+        </nav>
+        <!-- Container dPresupuesto-->
+   
+  <div class="presupuesto-container">
+    <table class="tabla-rigida">
+        <thead>
+            <tr>
+                <th colspan="4" style="text-align: left; padding: 15px; background-color: #2c3e50; color: white;">
+                    CONFIGURACIÓN DE TARIFAS: CRISTALES Y TRATAMIENTOS
+                </th>
+            </tr>
+            <tr style="background-color: #f8f9fa; color: #2c3e50; font-size: 0.9em;">
+                <th style="padding: 10px; width: 25%; text-align: left;">Tipo de Cristal</th>
+                <th style="padding: 10px; width: 25%; text-align: center;">Precio Base ($)</th>
+                <th style="padding: 10px; width: 25%; text-align: center;">Suplemento AR  o Blue($)</th>
+                <th style="padding: 10px; width: 25%; text-align: center;"> Fotocromatico ($)</th>
+                <th style="padding: 10px; width: 25%; text-align: center;"> Policarbonato ($)</th>
+            </tr>
+        </thead>
+      <tbody>
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Visión Sencilla</td>
+        <td><input id="Vision_sencilla" type="number" class="precio-input" placeholder="0.00" step="0.01"></td>
+        <td><input id="Vision_sencilla_Tratamiento" type="number" class="precio-input" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Vision_sencilla_Tratamiento_Foto" type="number" class="precio-input" placeholder="+0.00" step="0.01"></td>
+               <td><input id="Vision_sencilla_Poli" type="number" class="precio-input" placeholder="+0.00" step="0.01"></td> 
+    </tr>
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Visión Sencilla Tallado</td>
+        <td><input id="Vision_Tallado" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Vision_Tallado_Tratamiento" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Vision_Tallado_Tratamiento_Foto" type="number" class="precio-input" min="0"placeholder="+0.00" step="0.01"></td>
+                <td><input id="Vision_Tallado_Poli" type="number" class="precio-input" min="0"placeholder="+0.00" step="0.01"></td>
+    </tr>
+      <tr>
+        <td class="etiqueta" style="font-weight: bold;">Visión Formula Alta</td>
+        <td><input id="Visión_Formula_Alta" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Visión_Formula_Alta_AR" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Visión_Formula_Alta_Foto" type="number" class="precio-input" min="0"placeholder="+0.00" step="0.01"></td>
+                <td><input id="Visión_Formula_Alta_Poli" type="number" class="precio-input" min="0"placeholder="+0.00" step="0.01"></td>
+ 
+    </tr>
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Bifocales</td>
+        <td><input id="Bifocales" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Bifocales_Tratamiento" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Bifocales_Tratamiento_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Bifocales_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+    </tr>
+    
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Bifocales Tallados</td>
+        <td><input id="Bifocales_Tallados" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Bifocales_Tallados_Tratamiento" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Bifocales_Tallados_Tratamiento_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Bifocales_Tallados_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+    </tr>
+      <tr>
+        <td class="etiqueta" style="font-weight: bold;">Bifocales Formula Alta</td>
+        <td><input id="Bifocales_Formula_Alta" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Bifocales_Formula_Alta_AR" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Bifocales_Formula_Alta_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Bifocales_Formula_Alta_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+    </tr>
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Multifocal</td>
+        <td><input id="Multifocales" type="number" class="precio-input"min="0"  placeholder="0.00" step="0.01"></td>
+        <td><input id="Multifocales_Tratamiento" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Multifocales_Tratamiento_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Multifocales_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+    </tr>
+    <tr>
+        <td class="etiqueta" style="font-weight: bold;">Multifocal Tallado</td>
+        <td><input id="Multifocales_Tallados" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Multifocales_Tallados_Tratamiento" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Multifocales_Tallados_Tratamiento_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Multifocales_Tallados_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+      
+    </tr>
+      <tr>
+        <td class="etiqueta" style="font-weight: bold;">Multifocal Formula Alta</td>
+        <td><input id="Multifocal_Formula_Alta" type="number" class="precio-input" min="0" placeholder="0.00" step="0.01"></td>
+        <td><input id="Multifocal_Formula_AR" type="number" class="precio-input"min="0" placeholder="+0.00" step="0.01"></td>
+        <td><input id="Multifocal_Formula_Alta_Foto" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+                <td><input id="Multifocal_Formula_Alta_Poli" type="number" class="precio-input" min="0" placeholder="+0.00" step="0.01"></td>
+    </tr>
+</tbody>
+    </table>
+    
+    <div style="margin-top: 20px; text-align: right;">
+        <button id="Actualizar" style="background-color: #2980b9; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+            Guardar Tarifas Actualizadas
+        </button>
+    </div>
+</div>
+
+<style>
+    .precio-input {
+        width: 90%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: right;
+        color: #2980b9;
+        font-weight: bold;
+    }
+    .precio-input:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+    .etiqueta {
+        padding: 12px;
+        color: #34495e;
+        border-bottom: 1px solid #eee;
+    }
+</style>
+<script src="/dist/Presupuesto/index.min.js"></script>
+    </body>
+</html>

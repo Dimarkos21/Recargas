@@ -1,0 +1,640 @@
+<html>
+    <head>
+            <link rel='stylesheet' type='text/css' media='screen' href='index.css'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/axiosStatus.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<link rel="icon" type="image/png" href="../img/icon.png">
+    </head>
+
+<body>
+ <nav id="barra-navegacion">
+                        
+           
+            <div id="barra">
+
+                
+            <div id="menu-navegacion">
+                <div id="c">
+                    <ul id="menu-desplegable" class="visible">
+                        
+                            <li id="menu">
+                           
+ <!-- menu desplegable Casa, registro-->
+ <div id="contenido-menu"> 
+    <div class="container-menu" >
+   
+
+  <!--  home!-->
+<button id="Home-btn" class="btn"> 
+    
+    
+        <lord-icon
+    src="https://cdn.lordicon.com/jeuxydnh.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            <p id="menu-text">Casa</p>
+        </button>
+        </div>
+        <div class="container-menu" >
+      
+        </div>
+
+         <!--  Historial e!-->
+   <div class="container-menu" >
+                <button id="mensaje-historial" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                  <lord-icon
+            src="https://cdn.lordicon.com/dafdkyyt.json"
+            trigger="hover"
+            style="width:30px;height:30px">
+        </lord-icon>
+            
+                <p id="menu-text">    Historial</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  registro e!-->
+            <div class="container-menu" >
+                <button id="Registro-btn" class="btn"> 
+                    <lord-icon
+                    src="https://cdn.lordicon.com/mqgegihh.json"
+                    trigger="hover"
+                    style="width:30px ;height:30px">
+                 
+                </lord-icon>
+               
+              
+                <p id="menu-text">Registro</p>
+                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            </button>
+            </div>
+              <!--  Cliente-->
+    <div class="container-menu" >
+                <button id="Clientes-btn" class="btn"> 
+                 <img src="../img/persona.ico" style="width:30px ;height:30px">
+               
+              
+                <p id="menu-text">Cliente</p>
+             
+            </button>
+            </div>
+
+  <!--  mensaje! -->
+            <div class="container-menu" >
+                <button id="producto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/jprtoagx.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Productos</p>
+
+               
+                  
+            </button>
+            </div>
+
+ <div class="container-menu" >
+                <button id="Presupuesto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/cfkiwvcc.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Presupuesto</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  afacturacion! -->
+
+            <div class="container-menu" >
+                <button id="mensaje-btn" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/ytklkgsc.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">    Facturacion</p>
+
+               
+                  
+            </button>
+            </div>
+            
+              <!-- control de gastos! -->
+         
+                <div class="container-menu" >
+                <button id="Pedidos-btn" class="btn"> 
+
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/rezibkiy.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text"> Pedidos</p>
+
+               
+                  
+            </button>
+            </div>
+            <!-- control de gastos! -->
+             <div class="container-menu" >
+                <button id="controlGastos-btn" class="btn"> 
+                 
+     <img src="../img/IconGastos.png"  style="width:30px ;height:30px">
+                <p id="menu-text">Control</p>
+
+               
+                  
+            </button>
+            </div> 
+  <!-- config! -->
+   <div class="container-menu" >
+                <button id="administrador-btn" class="btn"> 
+                 
+         <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                <p id="menu-text">Administrador</p>
+
+               
+                  
+            </button>
+            </div>
+            
+            <div class="container-menu" >
+                <button id="config-btn" class="btn"> 
+                 
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                       
+                   
+                <p id="menu-text">Configuracion</p>
+
+               
+                  
+            </button>
+            </div>
+           
+          
+ </div>
+                       
+                    </li>
+                      
+
+                    <div id="soporte">
+                
+                    </div>
+                    </ul>     
+                </div>
+            
+                
+                <button id="boton-menu">
+                    <svg  xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+               <h1 id="inventary" >OptiGest</h1>
+                </button>
+                
+               </div>
+               
+            <div id="contenedor">
+                <h1 id="Inventarioss"> OptiGest</h1>
+
+            </div>
+        </div>
+         <!-- Botón que activa la ventana -->
+<button 
+  id="btnAbrirPapelera"
+  class="group flex items-center gap-2 bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-all duration-300 shadow-sm"
+>
+  <div class="relative">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"></path>
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+    </svg>
+  </div>
+  <span class="font-medium">Papelera</span>
+  <span class="bg-gray-100 text-gray-500 group-hover:bg-red-100 group-hover:text-red-600 text-xs font-bold px-2 py-0.5 rounded-full" id="contadorPapelera">
+    0
+  </span>
+</button>
+
+<div id="PapeleraFlota" class="papelera-container">
+    <div class="papelera-header">
+        <div class="titulo-grupo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-bin"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+            <h2>Productos Eliminados</h2>
+        </div>
+        <button id="cerrarPapeleraFlotante" title="Cerrar">&times;</button>
+    </div>
+    
+    <div id="cuerpoPapelera" class="papelera-body">
+        <p class="empty-msg">No hay elementos para restaurar</p>
+    </div>
+
+    <div class="papelera-footer">
+        <button class="btn-Borrar">Borrar todo</button>
+    </div>
+</div>
+
+
+    </div>
+         <!-- Botón que activa la ventana -->
+
+
+
+        </nav>
+          <div id="notificacion" class="oculto"></div>
+
+        <form id="formulario">
+             <div class="container">
+    <h2>Pacientes - Óptica</h2>
+
+    <section>
+        <h3>Datos del Cliente</h3>
+        <div class="grid">
+            <input type="text" id="nombre-cliente" placeholder="Nombre Completo" style="width: 100%;">
+            <input type="text" id="tel-cliente" placeholder="Cédula">
+                        <input type="text" id="telefono-cliente" placeholder="Telefono">
+          
+        </div>
+      
+    </section>
+
+    <section id="Formula">
+        <h3>Receta / Graduación</h3>
+        <div class="grid" style="margin-bottom: 10px;">
+
+            <input placeholder="Edad" class="grad-input" type="text" id="Edad">
+        </div>
+        
+        <table id="tabla-graduacion">
+            <thead>
+                <tr>
+                    <th>Ojo</th>
+                    <th>Esfera (SPH)</th>
+                    <th>Cilindro (CYL)</th>
+                    <th>Eje (AXIS)</th>
+                    <th>Adición (ADD)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>O.D.</strong></td>
+                    <td><input type="text" class="grad-input" id="EsferaOD" placeholder="0.00"></td>
+                    <td><input type="text" class="grad-input" id="CilindroD" placeholder="0.00"></td>
+                    <td><input type="text" class="grad-input" id="EjeD" placeholder="0°"></td>
+                    <td><input type="text" class="grad-input" id="AdicionD" placeholder="0.00"></td>
+                </tr>
+                <tr>
+                    <td><strong>O.I.</strong></td>
+                    <td><input type="text" class="grad-input" id="EsferaOI" placeholder="0.00"></td>
+                    <td><input type="text" class="grad-input" id="CilindroI" placeholder="0.00"></td>
+                    <td><input type="text" class="grad-input" id="EjeI"  placeholder="0°"></td>
+                    <td><input type="text" class="grad-input" id="AdicionI" placeholder="0.00"></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+<!-- TÍTULO DE SECCIÓN -->
+<div class="d-flex align-items-center my-4" id="AgudezaVisual">
+    <div style="width: 4px; height: 20px; background-color: #0d6efd; margin-right: 8px;"></div>
+    <h5 style="color: #0d6efd; font-weight: bold; margin: 0;">EXAMEN CLÍNICO / SALUD OCULAR</h5>
+</div>
+
+<!-- TABLA DE AGUDEZA VISUAL Y PIO -->
+<div class="table-responsive mb-4" id="AgudezaVisual2" >
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark" style="background-color: #212529; color: white;">
+            <tr>
+                <th style="width: 15%;">Ojo</th>
+                <th style="width: 28%;">Lejos (AV)</th>
+                <th style="width: 28%;">Cerca (AV)</th>
+                <th style="width: 29%;">PIO (mmHg)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.D.</td>
+                <td><input type="text" class="form-control text-center"   id="Lejos(AV)OD" placeholder="Ej. 20/20"></td>
+                <td><input type="text" class="form-control text-center"id="Cerca(AV)OD"  placeholder="Ej. J1"></td>
+                <td><input type="text" class="form-control text-center"  id="PIOOD" placeholder="Ej. 15"></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.I.</td>
+                <td><input type="text" class="form-control text-center"  id="Lejos(AV)OI"  placeholder="Ej. 20/20"></td>
+                <td><input type="text" class="form-control text-center" id="Cerca(AV)OI"  placeholder="Ej. J1"></td>
+                <td><input type="text" class="form-control text-center"id="PIO(AV)OI"   placeholder="Ej. 15"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- TÍTULO DE SECCIÓN -->
+<div class="d-flex align-items-center my-4" id="AgudezaVisual3" >
+    <div style="width: 4px; height: 20px; background-color: #0d6efd; margin-right: 8px;"></div>
+    <h5 style="color: #0d6efd; font-weight: bold; margin: 0;">EXAMEN CLÍNICO / SALUD OCULAR</h5>
+</div>
+
+<!-- TABLA DE AGUDEZA VISUAL Y PIO -->
+<div class="table-responsive mb-4" id="AgudezaVisual4" >
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark" style="background-color: #212529; color: white;">
+            <tr>
+                <th style="width: 15%;">Ojo</th>
+                <th style="width: 28%;">Vertice (DV)</th>
+                <th style="width: 28%;">Pantoscopico (AP)</th>
+                <th style="width: 29%;">Angulo Facial (AF)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.D.</td>
+                <td><input type="text" class="form-control text-center" id="VerticeOD"  placeholder="Ej. 20/20"></td>
+                <td><input type="text" class="form-control text-center"  id="PantoscopicoOD" placeholder="Ej. J1"></td>
+                <td><input type="text" class="form-control text-center"   id="AFOD"   placeholder="Ej. 15"></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.I.</td>
+                <td><input type="text" class="form-control text-center"  id="VerticeOI"  placeholder="Ej. 20/20"></td>
+                <td><input type="text" class="form-control text-center"  id="PantoscopicoOI"  placeholder="Ej. J1"></td>
+                <td><input type="text" class="form-control text-center"  id="AFOI"   placeholder="Ej. 15"></td>
+                
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="table-responsive mb-4" id="AgudezaVisual5" > 
+    <table class="table table-bordered text-center align-middle">
+        <thead class="table-dark" style="background-color: #212529; color: white;">
+            <tr>
+                <th style="width: 15%;">Ojo</th>
+                <th style="width: 28%;">Naso Pupilar (DNP L)</th>
+         
+                <th style="width: 29%;">Naso Pupilar  (DNP C)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.D.</td>
+          
+                <td><input type="text" class="form-control text-center"   id="DNP-OD-L"   placeholder="Ej. 30mm"></td>
+                 <td><input type="text" class="form-control text-center"   id="DNP-OD-C"   placeholder="Ej. 15mm"></td>
+            </tr>
+            <tr>
+                <td style="font-weight: bold; background-color: #f8f9fa;">O.I.</td>
+            
+                <td><input type="text" class="form-control text-center"  id="DNP-OI-L"   placeholder="Ej. 20mm"></td>
+                 <td><input type="text" class="form-control text-center"   id="DNP-OI-C"   placeholder="Ej. 15mm"></td>
+                
+            </tr>
+        </tbody>
+    </table>
+</div>
+<!-- Contenedor del Switch -->
+<div  class="opti-switch-container">
+    <span class="switch-label-text">Especialidad:</span>
+    
+    <label  class="opti-switch">
+        <!-- Input oculto pero funcional -->
+        <input type="checkbox"  id="Optometria_Oftamologia" >
+        
+        <!-- El riel y los textos -->
+        <span class="opti-slider-rail">
+            <span class="text-optometria">Optometría</span>
+            <span class="text-oftalmologia">Oftalmología</span>
+            <!-- El botoncito que se desliza -->
+            <span class="opti-thumb"></span>
+        </span>
+    </label>
+</div>
+
+<style>
+/* Contenedor general */
+.opti-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 12px 0;
+}
+
+.switch-label-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+/* Estructura principal del switch */
+.opti-switch {
+    position: relative;
+    display: inline-block;
+    width: 220px; /* Ancho suficiente para que quepan los textos */
+    height: 40px;
+    cursor: pointer;
+}
+
+/* Ocultar el checkbox real */
+.opti-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* El riel de fondo */
+.opti-slider-rail {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 9999px;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+}
+
+/* Textos dentro del switch */
+.opti-slider-rail span:not(.opti-thumb) {
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 2;
+    transition: color 0.3s ease;
+    user-select: none;
+}
+
+/* Colores iniciales de los textos (Optometría activo por defecto) */
+.text-optometria {
+    color: #1f2937;
+}
+.text-oftalmologia {
+    color: #9ca3af;
+}
+
+/* El "botón" deslizante (thumb) */
+.opti-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    height: 32px;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+/* EFECTO CUANDO SE ACTIVA (Pasa a Oftalmología) */
+.opti-switch input:checked + .opti-slider-rail .opti-thumb {
+    transform: translateX(100%);
+}
+
+.opti-switch input:checked + .opti-slider-rail {
+    background-color: #eff6ff; /* Un toque azul suavecito de fondo opcional */
+    border-color: #dbeafe;
+}
+
+.opti-switch input:checked + .opti-slider-rail .text-optometria {
+    color: #9ca3af;
+}
+
+.opti-switch input:checked + .opti-slider-rail .text-oftalmologia {
+    color: #1d4ed8; /* Color azul corporativo llamativo */
+}
+</style>
+    <section id="Tratamiento">
+        <h3>Tratamiento / Detalles de Cristales</h3>
+        <table id="tabla-detalles">
+            <thead>
+                <tr>
+                    <th>Tratamientos</th>
+                    <th>DP (Distancia Pupilar)</th>
+                    <th>Tipo de Cristales</th>
+                    <th>Altura</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="tratamientos" style="width: 100%;">
+                            <option value="none">Sin tratamiento (Solo Graduación)</option>
+                          
+                            <option value="Antirreflejo">Antirreflejo Estándar</option>
+                                  <option value="Blue Block">Filtro Protección Azul (Blue Block)</option>
+                            <option value="Policarbonato">Policarbonato</option>
+                            <option value="Fotocromatico">Fotocromático </option>
+                            <option value="Fotocromatico(AR)">Fotocromático (AR)</option>
+                      <option value="Fotocromatico(Blue)">Fotocromático (Blue)</option>
+                                 <option value="Hi index">Hi index</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="grad-input" placeholder="DP" id="DP"></td>
+                    <td>
+                        <select id="Cristales" style="width: 100%;">
+                            <option value="none" selected disabled hidden>Tipo de Cristales</option>
+                            <option value="Vision Sencilla">Visión Sencilla</option>
+                            <option value="Vision Sencilla Tallado">Visión Sencilla Tallado</option>
+
+                            <option value="Bifocales">Bifocales</option>
+                            <option value="Bifocales Tallados">Bifocales Tallados</option>
+               
+                            <option value="Multifocales">Multifocales</option>
+                            <option value="Multifocales Tallados">Multifocales Tallados</option>
+                           
+                                    <option value="Multifocales Digitales">Multifocales Digitales</option>
+                              
+                        </select>
+                    </td>
+                    <td><input type="text" class="grad-input" placeholder="Altura" id="Altura"></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h3>Resultados</h3>
+     <td><input type="text" class="grad-input" placeholder="Resultados" id="Resultados"></td>
+    
+    </section>
+
+  
+
+    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px; padding-bottom: 50px;">
+
+        <button id="btn-guardar" class="btn-print" style="background-color: #2c3e50; color: white; padding: 10px 25px; border: none; cursor: pointer; border-radius: 4px;">Guardar en Sistema</button>
+    </div>
+</div>
+        </form>
+
+    
+   
+
+<div id="datos">
+    <h3 > Pacientes:</h3>
+    <div>
+        <input id="buscar" >
+        <button id="buscar-btn">Buscar</button>
+    </div>
+   
+    
+
+    <div id="sugerencias"></div>
+    
+</div>
+    
+    <script src="/dist/Inventario/index.min.js"></script>
+    </body>
+</html>
+

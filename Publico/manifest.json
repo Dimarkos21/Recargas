@@ -1,0 +1,31 @@
+{
+  "short_name": "OptiGest",
+  "name": "OptiGest - Gestión de Óptica",
+  "description": "Sistema profesional de control de inventario.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#007bff",
+  "background_color": "#ffffff",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/img/Cristal.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Publico/img/OptiGesty.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Publico/img/OptiGesty.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

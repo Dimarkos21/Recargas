@@ -1,0 +1,465 @@
+require('dotenv').config();
+
+
+const findOrCreate = require('mongoose-findorcreate');
+const User = require('./models/user'); // Asegúrate de que esta sea la ruta correcta a tu modelo User que vimos antes
+
+const { log } = require('console');
+const express = require('express');
+const app = express();
+// COntraseña Libreria
+
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+// ==========================================
+// CONFIGURACIÓN PASSPORT GOOGLE OAUTH 2.0
+// ==========================================
+
+
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+
+
+
+
+// ==========================================
+// 1. CONFIGURACIÓN DE SESIONES (Obligatorio antes de Passport)
+// ==========================================
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'un_secreto_super_seguro_para_tu_sesion',
+    resave: false,
+    saveUninitialized: false,
+    // Nota para producción (2026): si usas HTTPS real, añade: cookie: { secure: true }
+}));
+
+// ==========================================
+// 2. INICIALIZACIÓN DE PASSPORT
+// ==========================================
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET ,
+    callbackURL: 'http://localhost:3006/auth/google/callback'
+  },
+ async function(accessToken, refreshToken, profile, cb) {
+    try {
+      const emailUser = profile.emails && profile.emails[0] ? profile.emails[0].value : '';
+
+      // Usando $or para buscar por googleId O por su correo electrónico
+      let user = await User.findOne({
+        $or: [
+          { googleId: profile.id },
+          { email: emailUser }
+        ]
+      });
+
+      if (!user) {
+        // Si no existe con ninguno de los dos, lo creamos nuevo
+        user = await User.create({
+          googleId: profile.id,
+          name: profile.displayName,
+          email: emailUser,
+          verified: true
+        });
+      } else if (!user.googleId) {
+        // Opcional: si el usuario ya existía por correo pero no tenía googleId, se lo asociamos
+        user.googleId = profile.id;
+        await user.save();
+      }
+
+
+
+
+
+   
+
+   
+
+
+   
+
+
+      return cb(null, user);
+    } catch (err) {
+      return cb(err, null);
+    }
+  }
+));
+
+passport.serializeUser(function(user, cb) {
+    process.nextTick(function() {
+      cb(null, { id: user.id });
+    });
+});
+
+passport.deserializeUser(function(user, cb) {
+    process.nextTick(function() {
+      return cb(null, user);
+    });
+});
+
+// ==========================================
+// 3. RUTAS DE GOOGLE OAUTH
+// ==========================================
+app.get('/auth/google', 
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function(req, res) {
+        // Autenticación exitosa, redirige a la tienda o panel
+        // El usuario ya fue autenticado y Passport lo inyecta en req.user
+      const user = req.user;
+
+      // 1. Creamos el Token con los datos del usuario real
+      const userForToken = {
+        id: user._id,
+        rol: user.rol || 'usuario' // Usa su rol de la base de datos
+      };
+
+      const token = jwt.sign(userForToken, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '2d',
+      });
+
+      // 2. Configuramos la cookie con el token
+      res.cookie('accessToken', token, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2), // 2 días (coincide con el JWT)
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+        sameSite: 'lax'
+      });
+        res.redirect('/');
+          }
+);
+
+const mongoose = require('mongoose');
+const path = require('path');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
+const helmet = require('helmet');
+
+// Controladores
+const usersRouter = require('./controllers/users');
+const loginRouter = require('./controllers/login');
+const todosRouter = require('./controllers/todos');
+const { userExtractor } = require('./middleware/auth');
+const productosJuegosRouter = require('./controllers/Productos_Juegos_item');
+const configuracionRouter = require('./controllers/configuracion');
+const registerRouter = require('./controllers/registro');
+const facturacionRouter = require('./controllers/facturacion');
+const logoutRouter1 = require('./controllers/logout');
+const HistorialRouter = require("./controllers/historial");
+const statsRouter = require('./controllers/estadisticas'); 
+const statsMiddleware = require("./middleware/statsMiddleware"); 
+const PresupuestoRouter = require('./controllers/presupuesto');
+const ControlRouter = require('./controllers/control_gatos');
+const ProductoAgregarRouter = require('./controllers/productosAgregar');
+const NegocioRouter = require("./controllers/negocio");
+const { auditMiddleware } = require('./middleware/setAuditContext');
+const authMaster = require('./middleware/authMaster'); // Asegúrate de que este archivo exista
+const ProveedorRouter = require('./controllers/Proveedor');
+const {checkSubscription} = require("./middleware/Mensualida");
+
+ const NegociosControlRouter = require("./AdminControllers/Negocios");
+ const { obtenerTasaBCV } = require('./controllers/BCV');
+const pedidosRouter = require('./controllers/Pedidos');
+const clientesRouter = require('./controllers/clientes');
+const SucusalesRouter = require('./controllers/sucursales');
+const CajaDiaRouter   = require('./controllers/CajaDia');
+const GamesRouter = require('./controllers/Games'); // Asegúrate de que este archivo exista
+// Nueva ruta  para DeudasTotales
+const DeudasTotalesRouter = require('./controllers/DeudasTotales'); // Asegúrate de que este archivo exista
+
+const { syncCatalogWithShop2TopUp } = require('./services/syncService');
+
+const cron = require('node-cron');
+
+// ... tus middlewares y rutas ...
+
+// ==========================================
+// PROGRAMAR TAREA DIARIA (CRON JOB)
+// ==========================================
+// Formato: '0 0 * * *' se ejecuta todos los días a las 00:00 hrs
+cron.schedule('0 0 * * *', () => {
+  syncCatalogWithShop2TopUp();
+});
+// Nueva ruta para tu propia "API"
+
+// Conexión a Base de Datos
+(async() => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI_TEST);
+        console.log('✅ Conectado a MongoDB correctamente');
+    } catch (error) {
+        console.log('❌ Error en conexión:', error);
+    }
+})();
+
+// Middlewares generales
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser());
+app.use(morgan('tiny'));
+
+// --- RUTAS GOOGLE OAUTH ---
+app.get('/auth/google', 
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    function(req, res) {
+        // Autenticación exitosa, redirige a la página principal o tienda
+        res.redirect('/');
+    }
+);
+
+// --- SEGURIDAD HELMET (Configuración PWA 2026) ---
+app.use(
+  helmet({
+    crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
+  })
+);
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "default-src": ["'self'", "https://*.google.com", "https://*.googlesyndication.com"],
+      "script-src": [
+        "'self'", 
+        "https://pagead2.googlesyndication.com",
+        "https://googleads.g.doubleclick.net",
+        "https://*.adtrafficquality.google", 
+        "https://static.cloudflareinsights.com",
+        "https://optigest.com.ve",
+        "https://www.paypal.com",
+        "https://*.paypal.com",
+        "https://cdn.lordicon.com", 
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com", 
+        "https://unpkg.com",
+        "https://accounts.google.com", 
+        "https://www.gstatic.com",
+        "https://translate.google.com",     // ✨ AGREGADO: Permite el script del traductor
+        "https://translate.googleapis.com", // ✨ AGREGADO: Permite la API del traductor
+        "'unsafe-inline'",
+        "'unsafe-eval'"
+      ],
+      "connect-src": [
+        "'self'", 
+        "https://th.bing.com",
+        "https://*.r2.cloudflarestorage.com",
+        "https://cdnjs.cloudflare.com", 
+        "https://www.paypal.com", 
+        "https://*.paypal.com",
+        "https://cdn.lordicon.com", 
+        "https://cdn.jsdelivr.net",
+        "https://fonts.googleapis.com", 
+        "https://fonts.gstatic.com",
+        "https://cdn-icons-png.flaticon.com",
+        "https://*.giphy.com", 
+        "https://www.trazodecoracion.com",
+        "https://ve.dolarapi.com",
+        "https://accounts.google.com",
+        "https://www.gstatic.com",
+        "https://translate.google.com",     // ✨ AGREGADO
+        "https://translate.googleapis.com", // ✨ AGREGADO
+        "https://*.adtrafficquality.google", 
+        "https://pagead2.googlesyndication.com", 
+        "data:"
+      ],
+      "frame-src": [
+        "'self'", 
+        "https://www.paypal.com", 
+        "https://*.paypal.com",
+        "https://accounts.google.com", 
+        "https://www.gstatic.com",
+        "https://translate.google.com",     // ✨ AGREGADO
+        "https://*.doubleclick.net", 
+        "https://googleads.g.doubleclick.net",
+        "https://*.adtrafficquality.google", 
+        "https://www.google.com" 
+      ],
+      "img-src": [
+        "'self'", 
+        "data:", 
+        "blob:", 
+        "https://static1-es.millenium.gg/articles/7/27/62/7/@/127390-genshinpic004-1620x800-article_cover_bd-1.jpg", // Geshing IMPACT
+        "https://i.playground.ru/e/ZiVMN8BdZQfIY_mU6dZwNg.jpeg", // ACECRAFT
+        "https://www.uptoplay.net/imagescropped/oxidesurvivalislandicon128.jpgplus.webp",// OXIDE
+        "https://ares.shiftdelete.net/2022/09/discord-tema-degistirme-nasil-yapilir.jpg",// DISCORD
+        "https://tse3.mm.bing.net/th/id/OIP.FqU_sDagEInUGJ86Ccv-XQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+"bigctg_arena_breakout_infinite.webp",
+"https://tse3.mm.bing.net/th/id/OIP.kqkQ8HIIe29nRaieym5SuwHaEi?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+"https://tse3.mm.bing.net/th/id/OIP.YLPU7sfaOn0ZihtMk4wWLgHaED?r=0&rs=1&pid=ImgDetMain&o=7&rm=3","https://coremission.net/wp-content/uploads/2021/02/battleroyale17.jpg",
+"https://as1.ftcdn.net/v2/jpg/06/27/17/78/1000_F_627177845_t4i7TgJzx31LTvvfFebuKDtA7pCZaVmF.jpg",
+"https://iwant.games/wp-content/uploads/arena-breakout-infinite-thumb-468x702.jpg",
+"https://tse4.mm.bing.net/th/id/OIP.9GZBF1M2cvWqodq0cDBsGAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3",
+        "https://wallpapercave.com/wp/wp13111973.jpg",
+        "https://www.meditips.com", 
+        "https://static.vecteezy.com/system/resources/thumbnails/000/366/695/small_2x/r2er_fs2b_150709.jpg",
+        "https://images.unsplash.com", 
+        "https://*.lafam.com.co",
+        "https://pagead2.googlesyndication.com",
+        "https://*.adtrafficquality.google",
+        "https://img.freepik.com",       
+        "https://*.r2.cloudflarestorage.com",
+        "https://www.paypalobjects.com",
+        "https://*.giphy.com", 
+        "https://cdn.lordicon.com",
+        "https://www.bing.com",
+        "https://th.bing.com",
+        "https://www.trazodecoracion.com",
+        "https://cdn-icons-png.flaticon.com",
+        "https://www.gstatic.com"
+      ],
+      "worker-src": [
+        "'self'", 
+        "blob:", 
+        "https://fonts.googleapis.com", 
+        "https://fonts.gstatic.com"
+      ],
+      "manifest-src": ["'self'"],
+      "style-src": [
+        "'self'", 
+        "'unsafe-inline'", 
+        "https://fonts.googleapis.com",
+        "https://www.gstatic.com"
+      ],
+      "font-src": [
+        "'self'", 
+        "https://fonts.gstatic.com",
+        "data:"
+      ],
+      "object-src": ["'none'"],
+      "upgrade-insecure-requests": []
+    }
+  })
+);
+
+
+app.get('/panel-maestro', authMaster, (req, res) => {
+    res.sendFile(path.join(__dirname, 'SuperUsuario', 'index.html'));
+});
+
+
+// También necesitamos que el HTML encuentre su CSS y JS privado
+app.use('/SuperUsuario', authMaster, express.static(path.join(__dirname, 'SuperUsuario')));
+
+// --- RUTAS CRÍTICAS PWA (Deben ir antes del bloqueo JS) ---
+app.get('/manifest.json', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'Publico', 'manifest.json'));
+});
+
+// Ruta específica para el interceptor de Axios
+app.get('/axiosStatus.js', (req, res) => {
+    res.set('Content-Type', 'application/javascript');
+    res.sendFile(path.resolve(__dirname, 'Publico', 'axiosStatus.js'));
+});
+
+app.get('/sw.js', (req, res) => {
+    res.set('Content-Type', 'application/javascript');
+    res.sendFile(path.resolve(__dirname, 'Publico', 'sw.js'));
+});
+app.get('/.well-known/assetlinks.json', (req, res) => {
+    res.status(200).json([{
+        "relation": ["delegate_permission/common.handle_all_urls"],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.inventary.optica",
+            "sha256_cert_fingerprints": ["BC:36:7B:C6:63:09:82:26:AA:AE:B1:4E:A2:4E:F2:3D:A0:A8:CA:46:4C:2C:E3:CC:33:13:85:9D:DF:9D:E3:D1"]
+        }
+    }]);
+});
+
+
+
+// --- SERVIR ARCHIVOS OFUSCADOS ---
+app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
+// Middleware para bloquear rutas que terminen en index.js
+
+// =================================================================
+// 🛡️ FILTRO DE SEGURIDAD: Bloquear acceso a archivos fuente (.js nativos)
+// =================================================================
+// Middleware para bloquear rutas que terminen en index.js
+// Middleware para bloquear rutas que terminen en index.js
+
+// --- RUTAS FRONTEND ---
+// El orden importa: de lo específico a lo general
+app.get('/ads.txt', (req, res) => {
+    res.send('google.com, pub-9489161591508749, DIRECT, f08c47fec0942fa0');
+});
+// --- RUTA PARA EL SITEMAP XML (Colócala junto a las rutas de manifest.json y sw.js) ---
+app.get('/sitemap.xml', (req, res) => {
+    res.set('Content-Type', 'application/xml');
+    res.sendFile(path.resolve(__dirname, 'Publico', 'sitemap.xml'));
+});
+app.use('/', express.static(path.resolve('Publico', 'Home'))); // El Home al final
+app.use('/CContrasena', express.static(path.join(__dirname, 'Publico', 'CContrasena')));
+
+app.use(['/login', '/login/', '/Login', '/Login/'], express.static(path.resolve('Publico', 'Login')));
+app.use('/Recuperacion', express.static(path.resolve('Publico', 'recuperacion')));
+app.use('/Registro', express.static(path.resolve('Publico', 'Registro')));
+app.use('/Casa', express.static(path.resolve('Publico', 'Casa')));
+app.use('/Crema-Piel', express.static(path.resolve('Publico', 'Articulo(Crema Piel)')));
+app.use('/salud-visual', express.static(path.resolve('Publico', 'Salud')));
+app.use('/Finanzas', express.static(path.resolve('Publico', 'Articulo(Financiero)')));
+app.use('/Tipo-Cristales', express.static(path.resolve('Publico', 'Articulo(Tipo de cristales)')));
+app.use('/Inventario', express.static(path.resolve('Publico', 'Inventario')));
+app.use('/Presupuesto', express.static(path.resolve('Publico', 'Presupuesto')));
+app.use('/perfil', express.static(path.resolve('Publico', 'Perfil')));
+
+app.use('/juego/:name', express.static(path.resolve('Publico', 'Juego')));
+app.use('/Proveedores', express.static(path.resolve('Publico', 'Proveedores')));
+app.use('/Configuracion', express.static(path.resolve('Publico', 'Configuracion')));
+app.use('/Ordenes', express.static(path.resolve('Publico', 'Ordenes')));
+app.use('/Administrador', express.static(path.resolve('Publico', 'Administrador')));
+app.use('/Pedidos', express.static(path.resolve('Publico', 'Pedidos')));
+app.use('/Control/Gastos', express.static(path.resolve('Publico', 'Control-Gastos')));
+app.use('/Historial', express.static(path.resolve('Publico', 'Historial')));
+app.use('/img', express.static(path.resolve('Publico', 'img')));
+app.use('/Clientes', express.static(path.resolve('Publico', 'Clientes')));
+// --- RUTA PARA RECUPERACIÓN DE CONTRASEÑA ---
+// Esta ruta debe ir después de los middlewares de seguridad (Helmet)
+app.get('/reset-password/:id/:token', (req, res) => {
+    // Especificamos el archivo index.html dentro de la carpeta
+    res.sendFile(path.join(__dirname, 'Publico', 'CContrasena', 'index.html'));
+});
+// --- RUTAS API BACKEND (ABIERTAS) ---
+app.use('/api/users', usersRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/logout', logoutRouter1);
+app.use('/api/registro', registerRouter);
+app.use('/api/Game', GamesRouter);
+// Ruta PROTEGIDA PERO SEMI para que pueda pagar
+
+
+// --- RUTAS API BACKEND (PROTEGIDAS) ---
+app.use('/api/presupuesto', userExtractor, checkSubscription, PresupuestoRouter);
+app.use( '/api/CajaDia' ,  userExtractor, checkSubscription, CajaDiaRouter )
+app.use( '/api/DeudasTotales' ,  userExtractor, checkSubscription, DeudasTotalesRouter )
+app.use('/api/todos', userExtractor,checkSubscription,auditMiddleware('Pacientes'), todosRouter);
+app.use('/api/productosJuegosRouter',  productosJuegosRouter);
+app.use('/api/historial', userExtractor,checkSubscription, HistorialRouter);
+app.use('/api/clientes', userExtractor,checkSubscription, clientesRouter);
+app.use('/api/productosAgregar', userExtractor, checkSubscription,auditMiddleware('PRouter'), ProductoAgregarRouter);
+app.use('/api/proveedor', userExtractor,checkSubscription, ProveedorRouter);
+app.use('/api/sucursales', userExtractor,checkSubscription, SucusalesRouter);
+
+app.use('/api/configuracion', userExtractor, checkSubscription,configuracionRouter);
+
+app.use('/api/pedidos', userExtractor, pedidosRouter, );
+app.use('/api/stats', userExtractor, checkSubscription, statsRouter);
+app.use('/api/control_gatos', userExtractor,checkSubscription, ControlRouter);
+app.use('/api/negocios', userExtractor,checkSubscription, NegocioRouter);
+app.get('/api/tasaBCV', obtenerTasaBCV );
+// --- FILTRO DE SEGURIDAD (Protección de código fuente) ---
+// Rutas ApI BACKEND ADMIN 
+app.use('/api/negociosControl', userExtractor,    NegociosControlRouter );
+
+
+module.exports = app;

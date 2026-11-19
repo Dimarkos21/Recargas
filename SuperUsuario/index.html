@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Panel | Control Global</title>
+    <link rel="stylesheet" href="/SuperUsuario/index.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="maestro-container">
+      <input type="text" id="miInput" placeholder="Ingresa el dato...">
+<button id="miBoton">Enviar</button>
+    </div>
+    <main id="business-grid" class="grid">
+            <div class="loader">Cargando negocios...</div>
+        </main>
+
+<!-- Sidebar de Control Master -->
+    <aside>
+        <div>
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <h2 style="font-size: 1rem; font-weight: 700;">Shop2TopUp</h2>
+                    <span style="font-size: 0.75rem; color: var(--accent-indigo); font-weight: 600;">MASTER CONTROL</span>
+                </div>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-chart-pie" style="width: 20px;"></i> Finanzas y Utilidades
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-server" style="width: 20px;"></i> Costos de Proveedores
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-credit-card" style="width: 20px;"></i> Pasarelas y Comisiones
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-shield-halved" style="width: 20px;"></i> Vigilantes / Alertas
+                </a>
+            </div>
+        </div>
+        <div style="padding-top: 20px; border-top: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: #4f46e5; display: flex; align-items: center; justify-content: center; font-weight: bold;">M</div>
+                <div>
+                    <p style="font-size: 0.85rem; font-weight: 600;">Administrador</p>
+                    <p style="font-size: 0.75rem; color: var(--accent-emerald);">● Sistema En Línea</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Panel de Contenido -->
+    <main>
+        <header>
+            <div class="header-title">
+                <h1>Panel Financiero General</h1>
+                <p>Monitoreo en tiempo real de costes, comisiones y ganancia neta.</p>
+            </div>
+            <div class="filters">
+                <select class="select-filter">
+                    <option>Este Mes (Noviembre 2026)</option>
+                    <option>Mes Anterior</option>
+                    <option>Últimos 7 Días</option>
+                </select>
+            </div>
+        </header>
+
+        <div class="dashboard-body">
+            
+            <!-- TARJETAS DE KPIs (Costo, Ganancia Total, etc.) -->
+            <div class="metrics-grid">
+                
+                <!-- 1. Ventas Brutas -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Ventas Brutas</span>
+                        <div class="metric-icon icon-indigo">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value">$18,450.00</div>
+                    <div class="metric-footer">
+                        <span style="color: var(--accent-emerald); font-weight: 600;"><i class="fa-solid fa-arrow-up"></i> +14.2%</span> vs mes pasado
+                    </div>
+                </div>
+
+                <!-- 2. Costo Total (Proveedores) -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Costo de Proveedores</span>
+                        <div class="metric-icon icon-amber">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" style="color: #fbbf24;">$10,200.00</div>
+                    <div class="metric-footer">
+                        <span>Inversión en recargas al por mayor</span>
+                    </div>
+                </div>
+
+                <!-- 3. Comisiones de Pasarelas -->
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <span class="metric-title">Comisiones Bancarias / Pasarelas</span>
+                        <div class="metric-icon icon-rose">
+                            <i class="fa-solid fa-percent"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" style="color: var(--accent-rose);">$850.00</div>
+                    <div class="metric-footer">
+                        <span>Stripe, PayPal, Binance, etc. (~4.6%)</span>
+                    </div>
+                </div>
+
+                <!-- 4. GANANCIA TOTAL NETA (Destacada) -->
+                <div class="metric-card highlight">
+                    <div class="metric-header">
+                        <span class="metric-title" style="color: var(--accent-emerald);">Ganancia Neta Total</span>
+                        <div class="metric-icon icon-emerald">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                    </div>
+                    <div class="metric-value" style="color: var(--accent-emerald);">$7,400.00</div>
+                    <div class="metric-footer" style="color: #34d399;">
+                        <strong>Margen Real: ~40.1%</strong> sobre ventas
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECCIÓN INFERIOR: Tabla y Análisis de Rentabilidad -->
+            <div class="grid-split">
+                
+                <!-- Desglose por Pasarelas -->
+                <div class="card-box">
+                    <div class="card-header">
+                        <h3>Rendimiento por Pasarela de Pago</h3>
+                        <span style="font-size: 0.8rem; color: var(--text-secondary);">Comisiones vs Volumen</span>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Pasarela</th>
+                                    <th>Volumen Procesado</th>
+                                    <th>Comisión Aplicada</th>
+                                    <th>Costo de Comisión</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fa-brands fa-stripe" style="color: #818cf8; margin-right: 8px;"></i> Stripe</td>
+                                    <td>$8,500.00</td>
+                                    <td style="color: var(--text-secondary);">2.9% + $0.30</td>
+                                    <td style="color: var(--accent-rose); font-weight: 600;">-$276.80</td>
+                                    <td><span class="badge-status badge-success">Óptimo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-brands fa-paypal" style="color: #60a5fa; margin-right: 8px;"></i> PayPal</td>
+                                    <td>$5,200.00</td>
+                                    <td style="color: var(--text-secondary);">5.4% + $0.30</td>
+                                    <td style="color: var(--accent-rose); font-weight: 600;">-$310.80</td>
+                                    <td><span class="badge-status badge-warning">Alto Costo</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid fa-coins" style="color: #fbbf24; margin-right: 8px;"></i> Binance Pay</td>
+                                    <td>$3,250.00</td>
+                                    <td style="color: var(--text-secondary);">1.0% Fijo</td>
+                                    <td style="color: var(--accent-rose); font-weight: 600;">-$32.50</td>
+                                    <td><span class="badge-status badge-success">Excelente</span></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa-solid fa-mobile-screen" style="color: #c084fc; margin-right: 8px;"></i> Pago Móvil / Zelle</td>
+                                    <td>$1,500.00</td>
+                                    <td style="color: var(--text-secondary);">0% (Manual)</td>
+                                    <td style="color: var(--accent-emerald); font-weight: 600;">$0.00</td>
+                                    <td><span class="badge-status badge-success">Sin Comisión</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Resumen Financiero Lateral -->
+                <div class="card-box">
+                    <div class="card-header">
+                        <h3>Salud Financiera</h3>
+                    </div>
+                    <div class="profit-breakdown">
+                        <div class="breakdown-item">
+                            <div class="breakdown-info">
+                                <span>Retorno sobre Inversión (ROI)</span>
+                                <span style="color: var(--accent-emerald); font-weight: 700;">+72.5%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 72.5%; background-color: var(--accent-emerald);"></div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-item">
+                            <div class="breakdown-info">
+                                <span>Impacto de Comisiones</span>
+                                <span style="color: var(--accent-rose); font-weight: 700;">4.6%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: 4.6%; background-color: var(--accent-rose);"></div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(99, 102, 241, 0.1); border: 1px dashed rgba(99, 102, 241, 0.4); padding: 14px; border-radius: 12px; margin-top: 10px;">
+                            <p style="font-size: 0.8rem; color: #c7d2fe; line-height: 1.4;">
+                                <i class="fa-solid fa-circle-info" style="margin-right: 4px;"></i> <strong>Consejo Master:</strong> Fomentar pagos por Binance Pay o Pago Móvil reduciría tus pérdidas por comisiones en hasta un 40% este mes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+        
+    <script src="index.js"></script>
+</body>
+</html>

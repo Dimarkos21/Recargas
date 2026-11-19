@@ -1,0 +1,935 @@
+
+
+html, body { height: 100%; margin: 0; padding: 0;overflow: hidden;  /* Para evitar barras de desplazamiento */ }
+
+body { width: 100%;
+  
+
+
+
+background-image: url("../img/trabajo.png");
+background-size:cover;
+background-position: center;
+overflow-y: auto;
+}
+
+h1 {
+    
+
+    text-align: center;
+    font-family: "Jaro", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 2.5rem;
+
+background-image: url("https://th.bing.com/th?id=OIP.aUQjwl4qYlyhn_0HnzNNGgE8DF&w=316&h=197&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2");
+ 
+ 
+ -webkit-text-fill-color: transparent;
+ background-clip: text;
+background-position: center;
+
+background-size: cover;
+-webkit-text-stroke: 1px red ;
+}
+
+#menu-desplegable {
+    width: 14rem;
+    height: 100%;
+    left: -2rem;
+    background-color: rgba(56, 39, 131, 0.868);
+  border: solid 0.3rem ;
+  
+  position: absolute;
+  top: 1.2rem;   
+ z-index: 2;
+  
+  } 
+  #config {
+    width: 6rem;
+    height: 2.9rem;
+    background: transparent;
+  cursor: pointer;
+    border: transparent;
+  
+  display: flex;
+  }
+  .btn
+{
+
+  height: 20%;
+
+  display: flex;
+padding-top: 0.5rem;
+margin-top: 1rem;
+text-align: center;
+border: 0ch;
+
+border-radius: 3rem;
+background-color: transparent;
+cursor: pointer;
+}
+
+.btn:hover {
+ background-color: aquamarine;
+  
+}
+
+#mensaje-btn {
+    width: 12rem;
+}
+#config-btn { width: 14rem;}
+#soporte {
+display: flex;
+justify-content: end;
+flex-direction: column;
+position: relative;
+
+}
+.visible {
+    display: none;
+}
+
+.imagen { width: 3rem;}
+#barra {  
+width: 100%;
+    display: flex;
+    justify-content: space-between;
+   
+
+}
+#barra-navegacion {
+    width: 99%;
+  
+    display: flex;
+justify-content: center;
+
+
+
+border: solid red;
+
+}
+
+
+#menu-navegacion {
+width: 4rem;
+display: flex;
+justify-content: center;
+flex-direction: column-reverse;
+
+    
+}
+#menu {
+
+    position: relative;
+    top: 2rem;
+
+    display: flex;
+flex-direction: row;
+
+}
+
+#img-1{
+    width: 2rem;
+    height: 2rem;
+
+
+
+}
+#logo-menu{
+
+    width:2.8rem;
+    padding: 0.4rem;
+   
+}
+#menu-text { 
+     font-family: "Kanit", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  color: aliceblue;
+font-size: 1.5rem;
+padding: 0;
+margin: 0;
+
+margin-left: 1rem;
+
+}
+ #boton-menu { 
+   
+   
+background-color: transparent;
+
+display: flex;
+flex-direction: row;
+height: 2rem;
+justify-content: center;
+align-items: center;
+margin: 0;
+padding: 0;
+
+cursor: pointer;
+
+position: absolute;
+border-color: transparent;
+z-index: 2; 
+
+}
+#contenedor {
+    position: relative;
+    left: -6rem;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+
+}
+#contenedor1 {
+ 
+    
+display: flex;
+justify-content: space-evenly;
+height: 2rem;
+padding:3rem;
+
+
+
+
+}
+
+
+
+#nombre{
+    text-align: center;
+    align-items: center;
+    border: groove;
+    border-radius: 3rem;
+
+
+}
+#numero{
+    text-align: center;
+    align-items: center;
+border: groove;
+border-radius: 3rem;
+
+
+}
+#cedula {
+    text-align: center;
+    align-items: center;
+border: groove;
+border-radius: 3rem;
+
+
+}
+#monto {
+    text-align: center;
+    align-items: center;
+
+    border: groove;
+    border-radius: 3rem;
+
+}
+p {font-size: 1rem;}
+
+#boton {
+     background-color: transparent;
+    border: inset rgb(0, 255, 34);
+    
+}
+
+#tabladedatos {
+    width: 99%;
+
+   display: flex;
+   justify-content: space-evenly;
+
+}
+#tabla {
+    width: 100%;
+    height: 6rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    padding: 0;
+    
+     border-collapse: separate
+}
+
+#tabla1{ background-color: rgb(220, 220, 253);
+}
+#datos {background-color: red;
+}
+
+#datos1{
+    width: 10%;
+    height: 100%;
+    
+    background-color: antiquewhite;
+   
+
+}
+td { border: 1px solid #ddd; padding: 8px; word-break: break-all; /* Permite que las palabras largas se dividan para ajustarse a la línea */ white-space: normal; /* Asegura que el texto se ajuste y no se mantenga en una sola línea */ font-size: 1rem; /* Ajusta el tamaño del texto */ max-width: 200px; /* Define un ancho máximo para la celda */ }
+
+
+
+
+#container-1 {
+
+    width: 100%;
+ height: 100%;
+display: flex
+;
+justify-content: center;
+ 
+margin: 1rem;
+margin-left: -0.9rem;
+}
+
+
+#container-2 {
+
+ width: 95%;
+ height: 100%;
+border: solid aquamarine ;
+border-radius: 3%;
+
+
+}
+
+
+
+
+.Titulos {font-size: 2rem;}
+
+.img {
+    width: 10rem;
+}
+
+.estadisticas 
+    {
+        width: 30%; /* Ajusta el ancho para que quepan tres por fila */
+        margin: 10px; /* Espaciado entre los cuadros */
+        text-align: center;
+        box-sizing: border-box; /* Incluye el margen y el padding en el tamaño total */
+}
+
+
+#container-datos{
+width: 100%;
+height: 100%;
+
+
+display: flex;
+flex-direction: row;
+flex-wrap: wrap;
+}
+
+.container-menu{
+    display: flex;
+justify-content: start;
+margin: 0%;
+padding: 0%;
+}
+
+.img-2 {
+    width: 3rem;
+    height: 3rem;
+}
+
+
+
+
+
+.btn
+{
+   
+    height: 20%;
+ 
+    display: flex;
+ padding-top: 0.5rem;
+  margin-top: 1rem;
+  text-align: center;
+ border: 0ch;
+
+ border-radius: 3rem;
+ background-color: transparent;
+cursor: pointer;
+}
+
+.btn:hover {
+    background-color: aqua;
+    
+}
+
+
+/* ==========================================
+   CONTENEDOR PRINCIPAL  grid-template-columns: 480px 1fr;
+   ========================================== */
+#container-datos {
+    display: grid;
+   
+    gap: 20px;
+    padding: 15px;
+    background-color: #f8fafc;
+    
+    /* Control de altura estricto */
+    max-height: 60rem; 
+    height: 100%;
+    overflow-y: auto; 
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+/* ==========================================
+   FILTRO SUPERIOR
+   ========================================== */
+.filter-dashboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.custom-select {
+    border: 2px solid #eef2f7;
+    padding: 8px 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #2d3748;
+    outline: none;
+    background-color: white;
+}
+
+/* ==========================================
+   TARJETAS (LADO IZQUIERDO)
+   ========================================== */
+.stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left: 5px solid #e2e8f0;
+    transition: transform 0.2s ease;
+}
+
+.stat-card.success { border-left-color: #10b981; }
+.stat-card.warning { border-left-color: #f59e0b; }
+.stat-card.info { border-left-color: #3b82f6; }
+
+.stat-card .value {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.6rem;
+    color: #1e293b;
+    margin-top: 5px;
+    display: block;
+}
+
+/* ==========================================
+   GRÁFICOS (LADO DERECHO)
+   ========================================== */
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-container {
+    width: 100%;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Evita que el contenido interno estire el div */
+    height: 400px; 
+    overflow: hidden; 
+}
+
+.chart-container h4 {
+    margin: 0 0 15px 0;
+    font-size: 1rem;
+    color: #334155;
+    text-align: center;
+}
+
+/* Ajuste específico para que el círculo no se salga */
+.chart-container canvas {
+    flex-grow: 1;
+    width: 100% !important;
+    height: 90% !important;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* ==========================================
+   RESPONSIVE PARA CELULAR
+   ========================================== */
+@media (max-width: 768px) {
+     #H12{
+   visibility: hidden;}
+    #container-datos {
+        grid-template-columns: 1fr;
+        max-height: none; 
+        height: auto;
+    }
+
+    #Inventarioss { visibility: hidden;}
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-dashboard {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+:root {
+    --gold: #FFD700;
+    --silver: #C0C0C0;
+    --bronze: #CD7F32;
+    --primary: #2563eb;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+}
+
+.ranking-container {
+    background: var(--bg-card);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.ranking-date {
+    font-size: 0.9rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ranking-table th {
+    padding: 12px;
+    color: #64748b;
+    font-weight: 600;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.ranking-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+/* Estilo de Medallas */
+.medal {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+    color: white;
+    font-size: 0.85rem;
+}
+
+.gold { background: linear-gradient(45deg, #f1c40f, #f39c12); box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3); }
+.silver { background: linear-gradient(45deg, #bdc3c7, #95a5a6); }
+.bronze { background: linear-gradient(45deg, #e67e22, #d35400); }
+
+/* Info del Vendedor */
+.vendedor-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.monto {
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Barra de Eficiencia */
+.progress-bar {
+    width: 100px;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+/* Hover effect */
+.ranking-table tr:hover {
+    background-color: #f8fafc;
+    transition: 0.2s;
+}
+
+
+    #barra-navegacion{border: solid #4084f5;
+}
+
+
+
+
+
+#barra {
+  display: flex;
+    border-bottom: 2px solid   #4084f5;
+    
+}
+
+#menu-desplegable {background: linear-gradient(180deg,  #4084f5 0%,  #7086f5 100%);}
+
+
+h1 {
+  
+     -webkit-text-stroke: 1px rgb(255, 255, 255); 
+}
+
+#container-stock {
+    width: 100%;
+}
+
+#menu-desplegable {
+        overflow: auto;
+
+}
+@media screen and (max-width: 600px) {
+    
+    #p-datos input{
+width: 5rem;
+margin: 0;
+} 
+#container-datos {
+    width: 100%;
+    display: flex;
+
+    
+   
+    gap: 20px;
+    padding: 15px;
+    background-color: #f8fafc;
+    
+    /* Control de altura estricto */
+    max-height: 60rem; 
+    height: 100%;
+    overflow-y: auto; 
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+};
+
+
+@media screen and (max-width: 600px) {.container {
+
+    overflow: auto;
+
+    max-width: 850px;
+
+    margin: 0 auto;
+
+    background: #fff;
+
+    padding: 10px;
+
+    border-radius: 8px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+} 
+
+#menu {
+  margin-top: 2rem;
+}}
+
+
+.papelera-body {
+    height: 40%;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+#menu-desplegable {
+    background: linear-gradient(180deg, #4084f5 0%, #7086f5 100%);
+}
+@media (max-width: 728px) {
+    #menu-desplegable {
+        width: 280px;
+        height: 100vh;
+        left: 0;
+        top: 0;
+        background: linear-gradient(180deg, #e63946 0%, #b91d1d 100%);
+        position: fixed;
+        z-index: 10000;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+        border-radius: 0 25px 25px 0;
+      
+        flex-direction: column;
+        padding: 0;
+        box-sizing: border-box;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        overflow: auto;
+    }
+}
+#menu-desplegable {
+
+ 
+   left: 0;
+   padding: 1rem;
+background: linear-gradient(180deg, #4084f5 0%, #7086f5 100%);
+    border: solid 0.3rem;
+    position: absolute;
+    top: 0rem;
+}
+user agent stylesheet
+ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    padding-inline-start: 40px;
+    unicode-bidi: isolate;
+}
+:root {
+    --color-primary: #6366f1;
+    --color-secondary: #10b981;
+    --color-text: #374151;
+    --color-bg-light: #fefefe;
+    --color-bg-page: #f9fafb;
+    --color-border: #e5e7eb;
+}
+@media (max-width: 728px) {
+    #menu-desplegable::before {
+        background: linear-gradient(180deg, #4084f5 0%, #7086f5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+     
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: 2px;
+      
+        margin-bottom: 20px;
+        border-radius: 0 25px 0 0;
+    }
+}
+
+h1 {
+    text-align: center;
+    font-family: "Jaro", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 2.5rem;
+    background-image: url(https://th.bing.com/th?id=OIP.aUQjwl4qYlyhn_0HnzNNGgE8DF&w=316&h=197&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2);
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    background-position: center;
+    background-size: cover;
+  
+}
+
+#boton-menu {
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    position: absolute;
+    border-color: transparent;
+            z-index: 10001;
+}
+.btn{
+    margin: 0%;
+}
+
+#Inventarioss {
+border-color: white;
+}
+
+/* Estilos Generales */
+
+
+
+
+.sucursales-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Encabezado */
+.sucursales-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.sucursales-header h1 {
+    font-size: 2.2rem;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.sucursales-header p {
+    color: #7f8c8d;
+    font-size: 1.05rem;
+}
+
+/* Grilla de Sucursales */
+.sucursales-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+/* Tarjeta de Sucursal */
+.sucursal-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sucursal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Icono de la tarjeta */
+.sucursal-icon {
+    font-size: 2.5rem;
+    background: #eef2f7;
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Información de la tarjeta */
+.sucursal-info h3 {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-bottom: 6px;
+}
+
+.sucursal-amount {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+/* Indicador de tendencia o estado */
+.sucursal-trend {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.sucursal-trend.positive {
+    color: #27ae60;
+    background: #e8f8f0;
+}
+
+.sucursal-trend.negative {
+    color: #c0392b;
+    background: #fdedec;
+}
+
+
+
+#MetodosdePagoContainer{
+        width: 100%;
+    height: 100%;
+}
+
+#Presupuesto-btn {display: none;}
+#Pedidos-btn {display: none;}
+#Registro-btn { display: none;}
+h1 {
+  
+     -webkit-text-stroke: 1px rgb(107, 168, 238); 
+background-image: url("../img/Inventary.png");
+}

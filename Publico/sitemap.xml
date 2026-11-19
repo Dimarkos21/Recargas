@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- 1. El Home (Raíz de la web) -->
+  <url>
+    <loc>https://optigest.com.ve/</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- 2. Sección de Salud Visual -->
+  <url>
+    <loc>https://optigest.com.ve/salud-visual</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- 3. Artículo: Crema para la Piel -->
+  <url>
+    <loc>https://optigest.com.ve/Crema-Piel</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 4. Artículo: Tipo de Cristales -->
+  <url>
+    <loc>https://optigest.com.ve/Tipo-Cristales</loc>
+    <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- 5. Página de Login (Pública para que tus clientes entren) -->
+  <url>
+    <loc>https://optigest.com.ve/Login</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- 6. Página de Registro (Pública para captar nuevos usuarios) -->
+  <url>
+    <loc>https://optigest.com.ve/Registro</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

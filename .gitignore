@@ -1,0 +1,9 @@
+node_modules
+.env
+!.well-known/
+# Llaves de firma (Keystore)
+*.jks
+*.keystore
+*.pk8
+*.pem
+/signing.properties

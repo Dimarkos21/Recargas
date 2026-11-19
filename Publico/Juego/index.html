@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>scorpionGaming Store | Recargas y Diamantes al Instante</title>
+    <meta name="description" content="Plataforma automatizada de recargas para Free Fire, Roblox y más juegos. Validación de jugadores en tiempo real y entrega inmediata.">
+    <meta name="keywords" content="recargas free fire, diamantes robux, top ups, recargas de juegos venezuela, scorpion gaming store">
+    <meta name="author" content="scorpionGaming">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Redes Sociales -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="scorpionGaming Store | Recargas de Videojuegos Automatizadas">
+    <meta property="og:description" content="Compra diamantes y recargas para tus juegos favoritos de forma rápida, segura y automatizada.">
+    <meta property="og:image" content="/img/GamiGStoreScorpion.jpeg">
+    <meta property="og:url" content="https://scorpiongaming.com">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="scorpionGaming Store">
+    <meta name="twitter:description" content="Recargas instantáneas para Free Fire, Roblox y más juegos.">
+    <meta name="twitter:image" content="/img/GamiGStoreScorpion.jpeg">
+
+    <!-- Estilos y Fuentes -->
+    <link rel='stylesheet' type='text/css' media='screen' href='index.css'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Scripts Esenciales (Axios y Estado) -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="/axiosStatus.js"></script>
+
+    <!-- Manifest e Icono de la pestaña -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/img/GamiGStoreScorpion.jpeg" style="width: 100%; height: 100%; object-fit: contain;">
+</head> 
+<body> 
+    <nav id="barra">
+        <div class="brand-container" style="display: flex; align-items: center; gap: 10px;">
+            <img src="/img/GamiGStoreScorpion.jpeg" alt="scorpionGaming Logo" style="width: 100%; height: 2rem; object-fit: contain;">
+            <span id="brand-logo" style="font-weight: bold; font-size: 1.5rem; color: #ff4757;">scorpionGaming</span>
+        </div>
+        <a><button id="boton">Iniciar sesión</button></a>
+              <div   class="scorpion-nav-menu  oculto" >
+    <!-- Botón / Perfil visible en la barra -->
+    <div class="scorpion-profile-trigger" >
+        <div class="scorpion-user-avatar">es</div>
+        <span class="scorpion-user-pseudo">esc</span>
+        <svg class="scorpion-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+
+    <!-- Menú Desplegable -->
+    <div class="scorpion-flyout-menu">
+        <div class="scorpion-flyout-top">
+            <p class="scorpion-f-name">escorpion21</p>
+            <p class="scorpion-f-mail">escorpiescorpion@gmail.com</p>
+        </div>
+        
+        <div class="scorpion-f-separator"></div>
+
+        <div class="scorpion-f-links">
+            <a href="/perfil" class="scorpion-f-item">
+                <span class="scorpion-f-icon">👤</span> Mi perfil
+            </a>
+            <a href="/Ordenes" class="scorpion-f-item">
+                <span class="scorpion-f-icon">📦</span> Mis pedidos
+            </a>
+           
+            <a href="/perfil" class="scorpion-f-item">
+                <span class="scorpion-f-icon">⚙️</span> Configuración
+            </a>
+        </div>
+
+        <div class="scorpion-f-separator"></div>
+
+        <div class="scorpion-flyout-bottom">
+            <a href="/logout" class="scorpion-f-logout">Cerrar sesión</a>
+        </div>
+    </div>
+</div>
+    </nav>
+
+    <nav class="articulos-nav">
+        <div class="nav-container">
+            <ul class="nav-links">
+                <li><a href="/" class="active">📦 Recargas</a></li>
+                <li><a href="/catalogo">🎮 Catálogo de Juegos</a></li>
+                <li><a href="/soporte">💬 Soporte</a></li>
+            </ul>
+
+            <div class="nav-search">
+                <input type="text" id="search-articulo" placeholder="Buscar juego o paquete (ej. Free Fire).">
+                <button type="button" class="btn-search">🔍</button>
+            </div>
+        </div>
+    </nav>
+
+
+
+    
+    
+    <div class="main-container">
+      
+        
+      
+
+        
+
+        <main>
+         <div id="" class="catalogo-container">
+            <!-- Aquí se cargarán dinámicamente los productos desde el script -->
+              <section  id="catalogoContainer" class="intro" style="margin-top: 3rem;"> 
+                  </section> 
+         </div>
+         
+        </main>
+     <div class="store-main-container">
+    
+    <!-- SECCIÓN IZQUIERDA: Paquetes -->
+    <div class="packages-section">
+        <div class="section-header">
+            <div class="step-title">
+                <span id="Numberaciondepasos" class="step-badge">1</span>
+                <h2>Selecciona tu Paquete</h2>
+            </div>
+            <div class="toggle-options">
+                <button class="toggle-btn active">Bonos</button>
+                <button class="toggle-btn">Paquete</button>
+            </div>
+        </div>
+
+        <!-- Grid de Paquetes -->
+        <div  id="ProductosBonos"  class="packages-grid">
+         
+
+
+        </div>
+    
+           <!-- Grid de Paquetes -->
+        <div     id="PaqueteContainer"  style="display: none"  class="packages-grid"  >
+         
+
+
+        </div>
+              <!-- Grid de Paso 2 Ver -->
+            <div  id="COntainerPlayerID"  style="display: none"  class="input-group">
+  <label class="input-label">PLAYER ID </label>
+  <div class="input-wrapper">
+    <span class="input-badge" >ID</span>
+
+<input 
+  id="PlayerID" 
+  type="number" 
+  placeholder="Ingrese su UID" 
+  class="custom-input" 
+  
+/>
+         <button id="VerificarID" class="btn-continue">
+            Verificar ID
+        </button>
+
+  </div>
+    <style>
+    .compact-verify {
+        --bg-card: #131b2e;
+        --accent: #10b981;
+        --text-primary: #ffffff;
+        --text-secondary: #94a3b8;
+        
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        border: 1px solid rgba(51, 65, 85, 0.8);
+        border-radius: 12px;
+        padding: 12px 16px;
+        width: 100%;
+        max-width: 340px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 0 0 12px rgba(16, 185, 129, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Franja lateral brillante */
+    .compact-verify::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--accent);
+    }
+
+    .compact-verify .verify-avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--accent);
+        flex-shrink: 0;
+        background: #0f172a;
+    }
+
+    .compact-verify .verify-info {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .compact-verify .verify-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 3px;
+    }
+
+    .compact-verify .player-name {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .compact-verify .game-tag {
+        font-size: 0.65rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: rgba(59, 130, 246, 0.15);
+        color: #60a5fa;
+        padding: 2px 6px;
+        border-radius: 4px;
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .compact-verify .verify-details {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+    }
+
+    .compact-verify .player-id span {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .compact-verify .status-check {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.73rem;
+        background: rgba(16, 185, 129, 0.12);
+        padding: 2px 8px;
+        border-radius: 10px;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .compact-verify .status-check svg {
+        width: 12px;
+        height: 12px;
+        fill: var(--accent);
+    }
+</style>
+
+<div class="compact-verify">
+
+</div>
+<div >
+
+</div>  
+<div>    <div class="payment-grid" style="display: none">
+            <div class="payment-container">
+  
+  <!-- Opción Superior: Usar saldo disponible -->
+  <label class="payment-card balance-card">
+    <div class="payment-info">
+      <div class="payment-icon">👛</div>
+      <div class="payment-text">
+        <span class="payment-title">Usar mi saldo disponible</span>
+        <span class="payment-desc">Descontar $0,00 USD del total</span>
+      </div>
+    </div>
+    <input type="checkbox" id="useBalance">
+    <span class="toggle-switch"></span>
+  </label>
+
+
+</div>
+</div>
+     <!-- Grid de Métodos de Pago PASO 3 -->
+  <div id="MetodosDePagoPaso3" >
+    
+    <!-- X-Coins -->
+    <label class="payment-card">
+      <input type="radio" name="payment_method" value="Billetera">
+      <div class="payment-content">
+        <div class="payment-icon">🪙</div>
+        <div class="payment-text">
+          <span class="payment-title">Billetera-Scorpi</span>
+          <span class="payment-desc text-error" id="SaldoBilletera">$0,00 Escorpi • Insuficiente</span>
+        </div>
+      </div>
+    </label>
+
+    <!-- Binance Pay (Seleccionado por defecto) -->
+    <!-- Bolivares-->
+  
+    <!-- Bolivares-->
+    <label class="payment-card ">
+      <input type="radio" name="payment_method" value="pago_movil"  >
+      <div class="payment-content">
+        <div class="payment-icon">📱</div>
+        <div class="payment-text">
+          <span class="payment-title">Bolivares</span>
+          <span class="payment-desc">Sin recargos</span>
+        </div>
+      </div>
+    </label>
+
+    
+  </div>
+
+</div>
+    
+    </div>
+
+    </div>
+
+    <!-- SECCIÓN DERECHA: Resumen del Pedido -->
+    <div   class="order-summary">
+        <div class="summary-header">
+            <div class="summary-icon">💎</div>
+            <div class="summary-title-group">
+                <h3 id="NombredelProducto">Arena Breakout</h3>
+                <span>RESUMEN DEL PEDIDO</span>
+            </div>
+        </div>
+
+        <div class="summary-item-selected">
+            <span class="item-text">310 + 35</span>
+            <div class="quantity-control">
+                <button>-</button>
+                <span id="Cantidad_PRODUCTO">1</span>
+                <button>+</button>
+            </div>
+        </div>
+
+        <div class="summary-creator">
+            <span class="star-icon">⭐</span>
+            <p>ScorpionGaming<small>Recomendado</small></p>
+        </div>
+
+        <div class="summary-total">
+            <span>TOTAL A PAGAR</span>
+            <span class="total-price">Bs. 5.243,35</span>
+        </div>
+
+        <button id="Continuar" class="btn-continue">
+            CONTINUAR
+        </button>
+        
+        <button id="Comprar" class="btn-continue" style="display: none;">
+         COMPRAR 
+        </button>
+       
+    </div>
+  
+
+</div>
+
+  <div id="r4-pago-widget" class="modal-overlayR4" style="display: none;">
+        <div class="r4-card">
+            <div class="r4-header">
+                <h3>Pago Inmediato C2P (OTP) <button id="cerrarR4" type="button">X</button></h3>
+                <p>Ingresa tus datos para generar y confirmar la clave dinámica:</p>
+            </div>
+
+            <div class="r4-datos-box">
+                <p><strong>Comercio:</strong> ScorpionGaming</p>
+                <p class="r4-monto">Monto a pagar: <strong id="Conversion"> VES</strong></p>
+            </div>
+
+            <form id="c2pForm">
+                <!-- PASO 1: DATOS BÁSICOS -->
+                <div class="r4-group">
+                    <label for="telefono">Teléfono Afiliado (Pago Móvil)</label>
+                    <input type="text" id="telefono" placeholder="Ej. 04141234567" required autocomplete="off">
+                </div>
+
+                <div class="r4-group">
+                    <label for="cedula">Cédula de Identidad</label>
+                    <input type="text" id="cedula" placeholder="Ej. V12345678" required autocomplete="off">
+                </div>
+
+                <div class="r4-group">
+                    <label for="banco">Banco Emisor</label>
+                <select id="banco" class="r4-select" required>
+        <option value="" disabled selected>Selecciona el banco del cliente</option>
+        
+        <!-- Bancos Universales y Comerciales Principales -->
+        <option value="0102">0102 - Banco de Venezuela (BDV)</option>
+        <option value="0134">0134 - Banesco</option>
+        <option value="0105">0105 - Banco Mercantil</option>
+        <option value="0108">0108 - BBVA Provincial</option>
+        <option value="0191">0191 - Banco Nacional de Crédito (BNC)</option>
+        <option value="0172">0172 - Bancamiga</option>
+        
+        <!-- Demás Bancos Universales y Comerciales -->
+        <option value="0114">0114 - Bancaribe</option>
+        <option value="0151">0151 - BFC Banco Fondo Común</option>
+        <option value="0138">0138 - Banco Plaza</option>
+        <option value="0104">0104 - Banco Venezolano de Crédito (BVC)</option>
+        <option value="0128">0128 - Banco Caroní</option>
+        <option value="0137">0137 - Banco Sofitasa</option>
+        <option value="0156">0156 - 100% Banco</option>
+        <option value="0157">0157 - DelSur Banco Universal</option>
+        <option value="0171">0171 - Banco Activo</option>
+        <option value="0174">0174 - Banplus</option>
+        
+        <!-- Banca Pública -->
+        <option value="0163">0163 - Banco del Tesoro</option>
+        <option value="0175">0175 - Banco Bicentenario del Pueblo</option>
+        <option value="0166">0166 - Banco Agrícola de Venezuela</option>
+        <option value="0177">0177 - BANFANB</option>
+        
+        <!-- Bancos Microfinancieros y Digitales -->
+        <option value="0169">0169 - Mi Banco</option>
+        <option value="0168">0168 - Bancrecer</option>
+        <option value="0178">0178 - N58 Banco Digital</option>
+    </select>
+
+                </div>
+
+                <!-- PASO 2: CAMPO OTP (Oculto inicialmente) -->
+                <div class="r4-group" id="grupoOtp" style="display: none;">
+                    <label for="otp">OTP / Clave Dinámica Recibida</label>
+                    <input type="password" id="otp" placeholder="••••••" maxlength="8" autocomplete="off">
+                    <small>Ingresa el código que recibiste por SMS o generaste en la app de tu banco.</small>
+                </div>
+
+                <!-- Botón dinámico según el paso -->
+                <button  class="r4-btn" id="btnAccion" type="submit">Solicitar Clave Dinámica</button>
+                <p> 1. Llena con tus datos .</p>
+                <p> 2. Espera el codigo de tu banco</p>
+                   <p> 3. Pegas el codigo que te llego en el input cuando te aparesca.</p>
+            </form>
+        </div>
+    </div>
+        <footer>
+            <p id="derecho">&copy; 2026 scorpionGaming. Todos los derechos reservados.</p>
+        </footer>
+    </div> 
+
+   
+
+    <a href="https://wa.me/584242059100?text=Hola!%20Me%20interesa%20saber%20más%20sobre%20las%20recargas%20en%20scorpionGaming" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Escríbenos por WhatsApp">
+        <svg class="whatsapp-icon" viewBox="0 0 448 512">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+        </svg>
+    </a>
+
+  
+
+   <!-- Contenedor del Modal (aislado para no alterar tu web) -->
+<div id="authModalOverlay" class="auth-modal-overlay" style=" display: none;">
+    <div class="auth-modal-card">
+        
+        <!-- Botón de cerrar (X) -->
+        <button class="auth-close-btn">&times;</button>
+
+        <!-- Cabecera -->
+        <div class="auth-header">
+            <h2>Iniciar Sesión</h2>
+            <p>Inicia sesión en ScorpionsGaming</p> <!-- O tu dominio actual -->
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="auth-actions">
+            <!-- Botón de Google -->
+            <button  id="Google" class="auth-btn google-provider">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.2v3.15C3.18 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.5-.38-2.25s.13-1.53.38-2.25V6.6H1.2C.43 8.15 0 9.92 0 12s.43 3.85 1.2 5.4l4.08-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.18 2.68 1.2 6.6l4.08 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
+                Continuar con Google
+            </button>
+
+            <!-- Botón de Correo -->
+              <a href="/auth/google">
+            <button  class="auth-btn email-provider">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                Ingresa con Correo
+            </button>
+           </a>
+        </div>
+
+        <!-- Enlace de registro -->
+        <div class="auth-signup-text">
+            ¿No tienes cuenta? <a href="/auth/google">Crea una</a>
+        </div>
+
+
+        <!-- Línea divisoria -->
+        <hr class="auth-divider">
+
+        <!-- Soporte -->
+        <div class="auth-support">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            Help Center / Soporte
+        </div>
+
+    </div>
+</div>
+<!-- Contenedor flotante para las notificaciones -->
+<div id="toast-container" class="toast-container"></div>
+    
+    <script src="/dist/Juego/index.min.js"></script>
+</body>
+</html>

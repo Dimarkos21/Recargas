@@ -1,0 +1,1923 @@
+
+
+html, body { height: 100%; margin: 0; padding: 0;overflow: hidden;  /* Para evitar barras de desplazamiento */
+   background-image: url("https://www.bing.com/images/search?view=detailV2&ccid=YBBUMQJ4&id=C95A90A81BA5A71C2B7BE55B3362C3B05D0B0A6A&thid=OIP.YBBUMQJ4-BsVNnG0EZFPCwHaE7&mediaurl=https%3a%2f%2fimg.freepik.com%2ffotos-premium%2ffondo-escritorio-trabajo_115919-23105.jpg&cdnurl=https%3a%2f%2fth.bing.com%2fth%2fid%2fR.601054310278f81b153671b411914f0b%3frik%3dagoLXbDDYjNb5Q%26pid%3dImgRaw%26r%3d0&exph=417&expw=626&q=fondo+trabajo&simid=608001880782281986&FORM=IRPRST&ck=DCE74463F4AEC1EDB4865EB172585620&selectedIndex=7&itb=0&ajaxhist=0&ajaxserp=0");}
+
+body { width: 100%;
+
+height: 100%;
+
+
+background-image: url();
+background-size:cover;
+background-position: center;
+overflow-y: scroll;
+}
+
+h1 {
+  
+
+  text-align: center;
+  font-family: "Jaro", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.5rem;
+
+background-image: url("../img/Inventary.png");
+
+
+-webkit-text-fill-color: transparent;
+background-clip: text;
+background-position: center;
+
+background-size: cover;
+-webkit-text-stroke: 1px red ;
+z-index: 2;
+}
+
+h4 {
+  
+
+  text-align: center;
+  font-family: "Jaro", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.5rem;
+
+background-image: url("https://img.freepik.com/vector-gratis/fondo-azul-abstracto_698452-2759.jpg");
+
+
+-webkit-text-fill-color: transparent;
+background-clip: text;
+background-position: center;
+
+background-size: cover;
+-webkit-text-stroke: 1px red ;
+z-index: 2;
+}
+h3 {
+  
+
+  text-align: center;
+  font-family: "Jaro", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2.5rem;
+
+background-image: url("../img/Inventary.png");
+
+
+-webkit-text-fill-color: transparent;
+background-clip: text;
+background-position: center;
+
+background-size: cover;
+-webkit-text-stroke: 1px red ;
+z-index: 2;
+}
+#menu-desplegable {
+  width: 14rem;
+  height: 100%;
+  left: -2rem;
+  background-color: red;
+border: solid 0.3rem ;
+
+position: absolute;
+top: 1.2rem;   
+z-index: 2;
+
+}
+     /* Estilo para la notificación */
+     #notificacion {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 25px;
+      background: linear-gradient(to right, #00b09b, #96c93d);
+      color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      z-index: 1000;
+     
+      transform: translateY(-30px);
+      transition: opacity 0.3s ease, transform 0.3s ease;}
+
+      #notificacion.visible {
+        opacity: 1;
+        transform: translateY(0);
+   display: flex;
+    }
+
+    #notificacion.oculto {
+        display: none;
+    }
+#soporte {
+display: flex;
+justify-content: end;
+flex-direction: column;
+position: relative;
+
+}
+.visible {
+  display: none;
+  visibility: hidden;
+}
+
+.imagen { width: 3rem;}
+#barra {  
+width: 100%;
+  display: flex;
+  justify-content: space-between;
+ 
+
+}
+#barra-navegacion {
+  width: 99%;
+
+  display: flex;
+justify-content: center;
+
+
+
+border: solid red;
+
+}
+
+
+#menu-navegacion {
+width: 4rem;
+display: flex;
+justify-content: center;
+flex-direction: column-reverse;
+
+
+}
+#menu {
+
+  position: relative;
+  top: 4rem;
+
+  display: flex;
+flex-direction: row;
+
+}
+
+#img-1{
+  width: 2rem;
+  height: 2rem;
+
+
+
+}
+#logo-menu{
+
+  width:2.8rem;
+  padding: 0.4rem;
+ 
+}
+#menu-text { 
+   font-family: "Kanit", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+color: aliceblue;
+font-size: 1.5rem;
+padding: 0;
+margin: 0;
+
+margin-left: 1rem;
+}
+#boton-menu { 
+ 
+ 
+background-color: transparent;
+
+display: flex;
+flex-direction: row;
+height: 2rem;
+justify-content: center;
+align-items: center;
+margin: 0;
+padding: 0;
+
+cursor: pointer;
+
+position: absolute;
+border-color: transparent;
+z-index: 2;
+}
+#contenedor {
+  position: relative;
+  left: -6rem;
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+
+  margin: 2rem;
+
+
+}
+#contenedor1 {
+
+  
+display: flex;
+justify-content: space-evenly;
+height: 2rem;
+padding:3rem;
+
+
+
+
+}
+
+
+
+#nombre{
+  text-align: center;
+  align-items: center;
+  border: groove;
+  border-radius: 3rem;
+
+
+}
+#numero{
+  text-align: center;
+  align-items: center;
+border: groove;
+border-radius: 3rem;
+
+
+}
+#masBtn {   font-size: 24px; 
+border: 0.1rem solid red; }
+#monto {
+  text-align: center;
+  align-items: center;
+
+  border: groove;
+  border-radius: 3rem;
+
+}
+p {font-size: 1rem;}
+
+
+#info {
+  height: 2.4rem;
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+}
+#info-productos{
+  width: 10rem;
+  height: 2rem;
+
+display: flex;
+justify-content: space-evenly;
+
+
+
+}
+
+#boton {
+ width: 10rem;
+ height: 2.5rem;
+   background-color: transparent;
+  border: inset rgb(0, 255, 34);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#tabladedatos {
+  width: 99%;
+
+ display: flex;
+ justify-content: space-evenly;
+
+}
+#tabla {
+  width: 100%;
+  height: 6rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding: 0;
+  
+   border-collapse: separate
+}
+
+#tabla1{ background-color: rgb(220, 220, 253);
+}
+
+
+#datos1{
+  width: 10%;
+  height: 100%;
+  
+  background-color: antiquewhite;
+ 
+
+}
+td { border: 1px solid #ddd; padding: 8px; word-break: break-all; /* Permite que las palabras largas se dividan para ajustarse a la línea */ white-space: normal; /* Asegura que el texto se ajuste y no se mantenga en una sola línea */ font-size: 1rem; /* Ajusta el tamaño del texto */ max-width: 200px; /* Define un ancho máximo para la celda */ }
+
+
+
+
+
+
+
+#mensaje-btn {
+  width: 12rem;
+}
+#config-btn { width: 14rem;}
+
+.btn
+{
+  width: 10rem;
+  height: 20%;
+
+  display: flex;
+padding-top: 0.5rem;
+margin-top: 1rem;
+text-align: center;
+border: 0ch;
+
+border-radius: 3rem;
+background-color: transparent;
+cursor: pointer;
+}
+
+.btn:hover {
+ background-color: aquamarine;
+  
+}
+#Registro-img:hover {
+background-color: aliceblue;
+}
+
+.container-menu{
+  display: flex;
+justify-content: start;
+margin: 0%;
+padding: 0%;
+}
+#datos {
+
+  overflow-y: auto;
+}
+
+#config {
+  width: 6rem;
+  height: 2.9rem;
+  background: transparent;
+cursor: pointer;
+  border: transparent;
+
+display: flex;
+}
+
+
+
+
+
+
+
+
+
+.input-datos { 
+
+  border-radius: 3rem;
+margin-right: 2.6rem;
+margin-top: 0.4rem;
+
+}
+
+
+#contenedor1{
+  width: 97%;
+  height: 90%;
+ display: flex;
+flex-direction: column;
+align-items: center;
+  background-color: aliceblue;
+  padding: 0;
+  margin-top: 6rem;
+}
+#form {
+
+  width: 100%;
+  height: 30%;
+
+  display: flex;
+  justify-content: center;
+
+
+
+}
+
+#Mensaje { 
+  width: 10rem;
+  height: 2rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border-radius: 3rem;
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 0;
+padding: 0;
+padding-right: -4rem;
+}
+#Coste { 
+  width: 10rem;
+  height: 2rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+  border-radius: 3rem;
+display: flex;
+justify-content: center;
+align-items: center;
+margin: 0;
+padding: 0;
+padding-right: -4rem;
+}
+  #opciones {
+     width: 15rem;
+     height: 2rem;
+   background-color: red;
+   border-radius: 3rem;
+   margin: 0;
+  
+  text-align: center;
+  }
+  
+
+  .div-container {
+width: 50%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+ 
+    
+  }
+  .Titulos {width: 100%;
+  align-items: center;
+display: flex;
+
+justify-content: center;
+margin: 0;
+
+}
+
+
+
+
+#datos {
+  width: 100%;
+  height: 50%;
+margin: 0;
+ 
+ padding: 0;
+ display: flex;
+flex-direction: column;
+overflow-y: auto;
+
+}
+
+#p-datos {
+  width: 100%;
+display: flex;
+justify-content: space-between;
+margin: 1rem;
+
+}
+
+#config-delete {
+  
+  width: 6rem;
+  height: 2.9rem;
+  background: transparent;
+cursor: pointer;
+  border: transparent;
+ 
+
+}
+
+
+
+
+
+
+/* Estilo general */
+
+
+#formulario {
+  width: 100%;
+
+  background: #ffffff; /* Fondo blanco */
+  border-radius: 10px; /* Bordes redondeados */
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra elegante */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+ 
+  margin-top: 1rem;
+}
+
+/* Contenedor de las filas */
+.div-container {
+  display: flex;
+  flex-direction: column; /* Ordena las filas en columna */
+  gap: 1rem; /* Espaciado entre filas */
+}
+
+/* Estilo para cada fila */
+.fila {
+  display: flex; /* Coloca los elementos en línea (lado a lado) */
+  justify-content: space-between; /* Espacia los elementos */
+  align-items: center; /* Alinea los elementos verticalmente */
+  gap: 1rem; /* Espaciado entre el label y el input */
+}
+
+
+
+/* Estilo para los títulos (labels) */
+.Titulos {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333; /* Color oscuro */
+  white-space: nowrap; /* Evita que el texto se divida */
+}
+
+/* Estilo de los inputs */
+.input-bonito {
+  width: 70%; /* Hacer los inputs más pequeños */
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.input-bonito:focus {
+  outline: none;
+  border-color: #007BFF; /* Azul al enfocar */
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Botón estilizado */
+.boton-bonito {
+  background-color: #007BFF;
+  color: rgb(0, 0, 0);
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  align-self: center; /* Centra el botón */
+}
+
+.boton-bonito:hover {
+  background-color: #0056b3;
+  transform: scale(1.05); /* Ligero crecimiento */
+}
+
+.boton-bonito:active {
+  transform: scale(0.95); /* Efecto de presión */
+}
+
+
+#Moneda { width: 100%; /* Hacer los inputs más pequeños */}
+.container-mas {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los elementos salten a la siguiente línea */
+    gap: 10px; /* Espacio entre los elementos */
+    justify-content: flex-start; /* Alinea los elementos a la izquierda */
+    align-items: center; /* Centra los elementos verticalmente */
+    padding: 20px;
+    background-color: #f4f4f4; /* Fondo suave */
+    border-radius: 10px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra elegante */
+  gap: 10px; /* Espacio entre elementos */
+  align-items: center;
+  justify-content: space-between;
+}
+
+#descripcion {width: 100%;}
+p {width: 2rem;
+  padding: 0%;
+margin: 0%;}
+.input-datos {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc; /* Borde gris */
+  border-radius: 5px; /* Bordes redondeados */
+  background-color: #fff;
+  width: 200px;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+button:hover {
+  transform: scale(1.1); /* Efecto hover */
+  transition: transform 0.2s ease-in-out;
+}
+
+
+#descripcion, #container-boton {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los elementos salten a la línea siguiente si exceden el ancho */
+  align-items: flex-start; /* Alinea los elementos hacia la izquierda */
+}
+
+#descripcion {
+  width: 20rem;
+}
+.input-datos {
+  width: 100%; /* Asegura que los inputs no sobrepasen el contenedor */
+  margin-bottom: 10px; /* Espaciado entre los inputs */
+}
+
+p {
+  margin: 0; /* Elimina los márgenes de los párrafos */
+  padding-right: 10px; /* Espaciado entre el texto y el input */
+}
+
+#container-boton {
+  margin-top: 20px; /* Espaciado entre la sección de descripción y los botones */
+}
+
+button {
+  margin-right: 10px; /* Espaciado entre los botones */
+}
+
+lord-icon {
+  display: block; /* Asegura que los íconos respeten el diseño */
+}
+
+
+#pdf {
+  width: 50px;
+}
+#container-pdf{
+  width: 3.2rem;
+}
+
+#info {
+
+    background: transparent;
+    cursor: pointer;
+    border: transparent;
+    display: flex
+;
+
+
+}
+
+#info-productos-div1{width: 26rem;
+height: 20rem;
+overflow-y: auto;
+
+margin: 1rem;
+}
+#Precio {
+
+  width: 3rem;
+}
+
+
+@media (max-width: 650px) {
+
+h1 { display: none;}
+  #Inventary { display: flex;
+background-color: red;
+  }
+  #form {width: 100%;
+  height: 0%;
+
+
+}
+
+#barra {
+  width: 100%;
+  display: flex
+;
+  justify-content: space-between;
+  padding-top: 2rem;
+}
+  #contenedor1 {
+     width: 100%;
+     height: 90%;
+     margin-top: 0%;
+  }
+
+
+  #div-container {
+     width: 100%;
+     height: 90%;
+
+     background-color: red;
+   margin: 1rem;
+   
+  }
+}
+
+
+
+
+#contenedor1 {
+  display: flex; /* Habilita  */
+  flex-direction: column; /* Alinea en columna */
+  align-items: center; /* Centra elementos horizontalmente */
+  gap: 1rem; /* Espaciado entre elementos */
+margin-top: 40rem;
+
+padding: 40rem;
+}
+
+@media (max-width: 768px) {
+#info-productos-div1 {
+  width: 100%;
+  height: 40%;
+}
+
+.div-container {
+ padding-top: 5rem;
+  padding-left: 4rem;
+}
+
+#formulario {
+
+padding-bottom: 2rem;
+}
+
+}
+
+
+/* Botón */
+#btnAddProduct {
+  padding: 10px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+/* Modal */
+.modal {
+ 
+  position: fixed;
+  z-index: 999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+/* Contenido */
+.modal-content {
+  background-color: #fff;
+  margin: 10% auto;
+  padding: 20px;
+  width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #333;
+}
+
+/* Cierre */
+.close {
+  float: right;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Buscador */
+#searchInput {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+/* Resultados */
+#productResults {
+  list-style: none;
+  padding: 0;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+#productResults li {
+  padding: 6px;
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+}
+
+#productResults li:hover {
+  background-color: #f0f0f0;
+}
+#modalAddProduct {visibility: visible;overflow-y: scroll;}
+
+.ocultar {
+ display: none;
+}
+
+
+#Carrito {
+border: solid rgb(4, 240, 4);
+border-radius: 4rem;
+}
+
+.input-cantidad{
+  width: 5rem;
+
+  font-size: 14px;
+  border: 1px solid #ccc; /* Borde gris */
+  border-radius: 5px; /* Bordes redondeados */
+  background-color: #fff;
+
+}
+.cantidad-box {
+  display: flex;
+  justify-content: space-between                                                                                                                                                                                                                    ;
+}
+#Precio {
+  width: 5rem;
+}
+
+#productos-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.producto-card {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  width: 280px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.producto-info {
+  margin-bottom: 12px;
+}
+
+.producto-nombre {
+  font-size: 1.2em;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.producto-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.input-cantidad {
+  width: 60px;
+  text-align: center;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-mas, .btn-menos {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-mas:hover, .btn-menos:hover {
+  background: #0056b3;
+}
+
+.producto-acciones {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-eliminar, .btn-info {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-info {
+  background: #3498db;
+}
+
+#total-container {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1.4em;
+}
+/* Styling for the expanded container */
+.container-mas {
+    /* Assuming this is your card that expands */
+    display: flex;
+    flex-direction: column; 
+    /* Important: Ensure the inner content can be managed */
+}
+
+/* 1. Container for all products (The new scrollable area) */
+productos { 
+    /* The custom tag you are using in your HTML template */
+    display: block; /* Custom elements often need this */
+    max-height: 250px; /* Adjust this value as needed for height */
+    overflow-y: auto; /* Adds a vertical scrollbar when content exceeds max-height */
+    padding: 10px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+/* Optional: Style the scrollbar for aesthetics (Webkit browsers) */
+productos::-webkit-scrollbar {
+    width: 8px;
+}
+productos::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+productos::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+/* 2. Styling for each individual product card */
+.producto-card {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 3. Product Information (Name, Quantity, Price) */
+.producto-info {
+    flex: 1 1 50%; /* Takes up at least 50% width, allowing wrapping */
+    min-width: 150px; /* Prevents it from getting too small */
+}
+.producto-nombre {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+    color: #333;
+}
+.producto-info p {
+    margin: 3px 0;
+    font-size: 0.9em;
+}
+
+/* 4. Quantity Controls */
+.producto-controles {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    flex: 0 1 auto; /* Only take the space needed */
+    min-width: 100px;
+}
+.btn-menos, .btn-mas {
+    padding: 5px 10px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    transition: background-color 0.2s;
+}
+.btn-menos:hover, .btn-mas:hover {
+    background-color: #ddd;
+}
+.input-cantidad {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    margin: 0 5px;
+    padding: 5px 0;
+}
+
+/* 5. Action Buttons (Delete, Info) */
+.producto-acciones {
+    flex: 1 1 100%; /* Takes full width on small screens to stack nicely */
+    display: flex;
+    justify-content: flex-end; /* Align to the right on large screens */
+    gap: 10px;
+    margin-top: 10px;
+}
+.btn-eliminar, .btn-info {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+.btn-eliminar {
+    background-color: #f44336;
+    color: white;
+}
+.btn-info {
+    background-color: #2196f3;
+    color: white;
+}
+
+
+
+#Anadir {
+  width: 5rem;
+  height: 2.5rem;
+  border: solid rgb(252, 194, 194);
+  padding: 1rem;
+
+  border-radius: 2rem;
+   background-color: rgb(5, 217, 255);
+
+}
+
+#Anadir:hover {
+    background-color: rgba(0, 238, 255, 0.562);
+}
+
+#Completo {width: 9rem;}
+
+
+.block { display: none;}
+.visible11 { display: flex;}
+#text {display: flex;
+flex-direction: column;}
+
+.div-container {
+
+
+}
+
+#contenedorCuotas {
+  width: 20rem;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.cuota-item {
+  display: flex;
+  flex-direction: row;   /* label e input en fila */
+  align-items: center;   /* alineados verticalmente */
+  gap: 0.5rem;           /* espacio entre label e input */
+  margin-bottom: 8px;    /* separación entre cuotas */
+}
+
+.green { 
+  background-color: green;
+}
+.red {
+  background-color: rgb(253, 4, 4);
+}
+
+#CuotaConfirmada {
+background-color: rgb(27, 215, 27);
+color: white;
+border-radius:  3rem;
+font-size: 0.9rem;
+border: solid 0.1rem;
+
+}
+#DivBuscar {
+  max-width: 720px;
+  margin: 12vh auto 0;
+  padding: 18px;
+  font-family: system-ui, sans-serif;
+  color: #e8ecf1;
+}
+
+.search-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.search-card input,
+.search-card .extra-input {
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: #000000;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease
+  background 160ms ease;
+}
+
+.search-card input:focus,
+.search-card .extra-input:focus {
+  border-color: #7c9eff;
+  box-shadow: 0 0 0 3px rgba(124, 158, 255, 0.25);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.search-card button {
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c9eff, #00d1b2);
+  color: #0a0d18;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(124, 158, 255, 0.35);
+  transition: transform 120ms ease, filter 160ms ease;
+}
+
+.search-card button:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.search-card button:active { transform: translateY(0); filter: brightness(0.96); }
+
+.extra-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.helper {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(232, 236, 241, 0.7);
+}
+
+
+/* Estilo para el span de Confirmada */
+.status-confirmada {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #d1e7dd; /* Verde claro */
+    color: #0f5132;           /* Verde oscuro para el texto */
+    border: 1px solid #badbcc;
+    border-radius: 20px;      /* Bordes muy redondeados (píldora) */
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: sans-serif;
+    vertical-align: middle;
+}
+
+/* Efecto opcional: un pequeño punto al lado */
+.status-confirmada::before {
+    content: "●";
+    margin-right: 5px;
+    font-size: 10px;
+}
+.Container-butones {
+display: flex;
+justify-content: space-around;
+
+}
+
+
+#Contenedor-informacion {
+  display: flex;
+  justify-content: space-between;
+}
+.barra-acciones-movil {
+  display: flex;
+  justify-content: space-between;
+
+}
+.barra-acciones-movil {
+
+position: relative;
+  display: flex !important;
+height: 2.5rem;
+
+  
+  padding: 5px;
+  border-radius: 8px;
+}
+
+
+/* 1. EL CONTENEDOR (Fijo en su lugar, no flota) */
+#Contenedor-informacion{
+  position: relative !important; /* Es el ancla para los botones */
+  display: block !important;    /* Evita comportamientos de flex que mueven el bloque */
+  width: 100% !important;
+  max-width: 650px;             /* Ancho máximo para PC */
+  margin: 20px auto !important; /* Lo centra y le da margen arriba/abajo */
+  padding: 20px !important;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-sizing: border-box !important; /* Evita que crezca por el padding */
+  box-shadow: 0px 2px 10px rgba(0,0,0,0.1); /* Sombra sutil para definir el borde */
+}
+
+/* 2. LOS BOTONES (Absolutos pero PRISIONEROS del contenedor) */
+.barra-acciones-movil {
+  position: absolute !important; 
+  top: 15px !important;    /* Distancia fija desde el borde superior del cuadro blanco */
+  right: 15px !important;  /* Distancia fija desde el borde derecho del cuadro blanco */
+  
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  z-index: 5;              /* Por encima de los inputs, pero dentro del div */
+}
+
+/* 3. EL CONTENIDO (Alineado a la izquierda sin margen excesivo) */
+.bloque-datos-izquierda {
+  width: 100% !important;
+  max-width: 380px;        /* Evita que los inputs toquen los botones de la derecha */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin: 0 !important;    /* Quitamos cualquier margin-left que lo mueva */
+}
+
+/* 4. PREVENIR QUE EL PRIMER LABEL SE TAPE */
+.campo-grupo:first-child {
+  margin-top: 30px !important; /* Da espacio para que los botones no tapen el texto "Número" */
+}
+
+/* 5. LOS INPUTS (No pueden salirse del contenedor) */
+.input-datos {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important; /* Crucial para que no se desborde */
+}
+
+
+/* --- VERSIÓN UNIFICADA MÓVIL ESTILO APP --- */
+@media (max-width: 728px) {
+
+    /* 1. Ajustes de Pantalla */
+    html, body {
+ 
+        background-color: #f4f7f6; /* Fondo gris claro para resaltar tarjetas */
+    }
+
+    
+    /* 2. Barra Superior Simple */
+    #barra {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: white;
+        border-bottom: 2px solid red;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    /* 3. Datos de Facturación (Inputs Ancho Completo) */
+    #contenedor1 {
+        width: 95% !important;
+        margin: 15px auto !important;
+        padding: 10px !important;
+        background: white !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    #formulario {
+        height: auto !important; /* Corregido para que se vea */
+        gap: 12px !important;
+    }
+
+    /* Estilo para el botón (+) Añadir Producto grande */
+    #Anadir {
+        width: 100% !important;
+        height: 3.5rem !important;
+        background-color: #007bff !important;
+        color: white;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        border: none;
+        margin-top: 10px;
+    }
+
+    /* 4. Título Productos Seleccionados */
+    h3 {
+        font-size: 1.4rem !important;
+        margin: 20px 0 10px 0 !important;
+        background: none !important;
+        -webkit-text-fill-color: #333 !important;
+        -webkit-text-stroke: 0 !important;
+    }
+
+    /* 5. CARDS DE PRODUCTOS (Individuales) */
+
+
+    /* Info: Nombre y Precio en la misma línea */
+  
+
+    /* Controles: [-] 2 [+] centrados */
+    .producto-controles {
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        background: #f8f9fa;
+        border-radius: 30px;
+        padding: 5px;
+        margin: 10px 0 !important;
+    }
+
+    .input-cantidad {
+        width: 60px !important;
+        border: none !important;
+        background: transparent !important;
+        font-size: 1.2rem !important;
+        text-align: center;
+    }
+
+    /* Acciones: Info y Eliminar */
+    .producto-acciones {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .btn-info, .btn-eliminar {
+        flex: 1;
+        padding: 10px !important;
+        border-radius: 8px !important;
+        font-size: 0.9rem !important;
+    }
+
+    /* 6. TOTAL Y BOTÓN FIJO (Sticky Bottom) */
+    #total-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        padding: 15px;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2000;
+    }
+
+    #Completo {
+        width: 60% !important;
+        height: 1.5rem !important;
+  text-align: center;
+        color: rgb(0, 0, 0) !important;
+        font-size: 1.2rem !important;
+        font-weight: 900 !important;
+        border-radius: 50px !important;
+        text-transform: uppercase;
+    }
+
+    /* Espacio extra al final para que el scroll no tape el último producto */
+    #productos-container {
+        padding-bottom: 150px !important;
+    }
+
+    /* Ajuste de Menu Desplegable para no chocar con el Sticky */
+    #menu-desplegable {
+        z-index: 3000;
+    }
+
+    .modal-content {
+    background-color: #fff;
+margin-top: 40%;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #333;
+}
+
+.input-bonito {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    color: #333;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+/* --- DISEÑO DE MENÚ PREMIUM PARA APP --- */
+#menu-desplegable {
+    width: 280px; 
+    height: 100vh;
+    left: 0;
+    top: 0;
+
+    /* Un rojo con un degradado sutil se ve más profesional */
+    background: linear-gradient(180deg, #e63946 0%, #b91d1d 100%);
+    position: fixed;
+    z-index: 10000;
+    
+    /* Sombra más suave y moderna */
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.2);
+    
+    /* Bordes redondeados solo en el lado derecho para suavizar la salida */
+    border-radius: 0 25px 25px 0;
+    
+    display: flex;
+    flex-direction: column;
+    padding: 0; /* Quitamos padding general para controlar los items */
+    box-sizing: border-box;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: auto;
+}
+
+/* Encabezado del Menú (Donde dice INVENTORY) */
+#menu-desplegable::before {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    color: white;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: rgba(0, 0, 0, 0.1); /* Sutil separación del resto */
+    margin-bottom: 20px;
+    border-radius: 0 25px 0 0;
+}
+
+/* Estilo para los Items (Enlaces/Botones) */
+#menu-desplegable a, 
+#menu-desplegable button {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    padding: 18px 25px;
+    margin: 4px 15px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* Efecto de Selección / Hover */
+#menu-desplegable a:hover, 
+#menu-desplegable button:hover,
+#menu-desplegable a:active {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    padding-left: 35px; /* Pequeño desplazamiento al tocar */
+}
+
+/* Añadir Iconos (si usas emojis o fuentes de iconos) */
+#menu-desplegable a::before {
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+/* Separador sutil antes del último item (ej. Administrador) */
+#menu-desplegable a:last-of-type {
+    margin-top: auto; /* Empuja el último botón hacia abajo */
+    margin-bottom: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 25px;
+}
+#boton-menu
+ {
+    background-color: transparent;
+    display: flex;
+    flex-direction: row;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    position: absolute;
+    border-color: transparent;
+    z-index: 10000;
+}
+
+#Inventarioss {
+    visibility: hidden;    /* Lo hace invisible pero mantiene el espacio */
+    pointer-events: none;  /* Hace que los clics "pasen de largo" (no es tocable) */
+    user-select: none;     /* Evita que se pueda seleccionar el texto si lo hubiera */
+}
+.producto-card {display: flex; 
+flex-direction: column;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
+  }
+
+
+  .container-mas {
+    display: flex;
+  flex-direction: column;
+  }
+
+  .input-datos { width: 5.5rem;}
+
+  /* Contenedor principal */
+.formulario-movil {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    background-color: #ffffff;
+    gap: 15px;
+}
+
+/* Cada grupo de Etiqueta + Input */
+.campo-grupo {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Estilo de los textos (Labels) */
+.label-form {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 5px !important;
+    text-align: left;
+}
+
+/* Estilo de los inputs como en tu referencia */
+.input-datos {
+    width: 100% !important;
+    padding: 12px 15px !important;
+    border: 1.5px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    font-size: 1rem !important;
+    background-color: #f8fafc !important;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.input-datos:focus {
+    border-color: #e63946 !important; /* Rojo de tu marca */
+    outline: none;
+}
+
+/* Barra de botones inferior */
+.barra-acciones-movil {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+    padding: 10px;
+    background: #f1f5f9;
+    border-radius: 15px;
+}
+
+.btn-circular {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+
+
+}
+#p-datos input {
+
+width: 100rem;
+margin-right: 0%;
+}
+}
+
+
+
+
+/* Estado inicial oculto */
+.modal-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Cambio de 'visible' a 'publico' */
+.modal-overlay.publico {
+    display: flex !important;
+}
+
+.modal-ventana {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    display: flex;
+   flex-direction: column;
+}
+
+#CuotasPendejas {
+  display: flex;
+ flex-direction: column;
+}
+
+/* Clase para ocultar el formulario */
+.hidden {
+    display: none !important;
+}
+
+/* Contenedor principal del Formulario de Proveedores */
+#form-proveedor {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    max-width: 650px;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    border: 1px solid #e1e1e1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Título con indicador de sección */
+#form-proveedor h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 1.5rem;
+    border-left: 5px solid #3498db; /* Azul para identificar Proveedores */
+    padding-left: 15px;
+}
+
+#form-proveedor p {
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+/* Separadores */
+#form-proveedor hr {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
+/* Etiquetas y Grupos de Input */
+.input-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+#form-proveedor label {
+    font-weight: 600;
+    color: #34495e;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+/* Inputs con estilo consistente */
+.input-datos {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid #dcdde1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #2f3640;
+    background-color: #f5f6fa;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.input-datos:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Contenedor de botones (Igual al de tus otros módulos) */
+#container-boton {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* Botón de Guardar */
+.btn-guardar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+.btn-guardar:hover {
+    background-color: #219150;
+    transform: translateY(-1px);
+}
+
+.btn-guardar:active {
+    transform: translateY(0);
+}
+
+/* Ajuste para inputs en la misma fila (Flexbox) */
+.row-inputs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.row-inputs .input-group {
+    flex: 1;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .row-inputs {
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+#form-proveedor {visibility: hidden;
+display: none;
+}
+/* Contenedor Principal */
+.container-form-pdf {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 20px auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header-pdf {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+/* Filas de Inputs (Proveedor y Mes) */
+.row-pdf {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.input-group-pdf {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-datos {
+    padding: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-datos:focus {
+    border-color: #3498db;
+}
+
+/* --- LA DROP ZONE --- */
+.drop-zone {
+    display: block;
+    border: 2px dashed #bdc3c7;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+    position: relative;
+}
+
+/* Efecto cuando arrastras el archivo encima (usar con JS classList.add) */
+.drop-zone.active, .drop-zone:hover {
+    border-color: #3498db;
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.drop-zone-content p {
+    margin: 10px 0 5px;
+    color: #7f8c8d;
+}
+
+.drop-zone-content span {
+    color: #3498db;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* Estado del archivo seleccionado */
+.file-info {
+    animation: fadeIn 0.4s ease;
+}
+
+#file-name {
+    word-break: break-all;
+    padding: 0 10px;
+}
+
+/* Botones */
+.footer-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-primario, .btn-secundario {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-primario {
+    background: #3498db;
+    color: white;
+}
+
+.btn-primario:hover {
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-secundario {
+    background: #ecf0f1;
+    color: #7f8c8d;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

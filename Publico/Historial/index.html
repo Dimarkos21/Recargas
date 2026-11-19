@@ -1,0 +1,292 @@
+<html>
+    <head>
+
+           <link rel='stylesheet' type='text/css' media='screen' href='index.css'>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bokor&family=DynaPuff:wght@400..700&family=Jaro:opsz@6..72&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Oswald:wght@200..700&family=Parkinsans:wght@300..800&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/axiosStatus.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="../img/icon.png">
+    </head>
+ 
+    <body>
+<nav id="barra-navegacion">
+                        
+           
+            <div id="barra">
+
+                
+            <div id="menu-navegacion">
+                <div id="c">
+                    <ul id="menu-desplegable" class="visible">
+                        
+                            <li id="menu">
+                           
+ <!-- menu desplegable Casa, registro-->
+ <div id="contenido-menu"> 
+    <div class="container-menu" >
+   
+
+  <!--  home!-->
+<button id="Home-btn" class="btn"> 
+    
+    
+        <lord-icon
+    src="https://cdn.lordicon.com/jeuxydnh.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            <p id="menu-text">Casa</p>
+        </button>
+        </div>
+        <div class="container-menu" >
+      
+        </div>
+
+         <!--  Historial e!-->
+   <div class="container-menu" >
+                <button id="mensaje-historial" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                  <lord-icon
+            src="https://cdn.lordicon.com/dafdkyyt.json"
+            trigger="hover"
+            style="width:30px;height:30px">
+        </lord-icon>
+            
+                <p id="menu-text">    Historial</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  registro e!-->
+            <div class="container-menu" >
+                <button id="Registro-btn" class="btn"> 
+                    <lord-icon
+                    src="https://cdn.lordicon.com/mqgegihh.json"
+                    trigger="hover"
+                    style="width:30px ;height:30px">
+                 
+                </lord-icon>
+               
+              
+                <p id="menu-text">Registro</p>
+                <script src="https://cdn.lordicon.com/lordicon.js"></script>
+            </button>
+            </div>
+              <!--  Cliente-->
+    <div class="container-menu" >
+                <button id="Clientes-btn" class="btn"> 
+                 <img src="../img/persona.ico" style="width:30px ;height:30px">
+               
+              
+                <p id="menu-text">Cliente</p>
+             
+            </button>
+            </div>
+
+  <!--  mensaje! -->
+            <div class="container-menu" >
+                <button id="producto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/jprtoagx.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Productos</p>
+
+               
+                  
+            </button>
+            </div>
+
+ <div class="container-menu" >
+                <button id="Presupuesto-btn" class="btn"> 
+                 
+               
+                
+                 
+<lord-icon
+    src="https://cdn.lordicon.com/cfkiwvcc.json"
+    trigger="hover"
+    style="width:30px ;height:30px">
+</lord-icon>
+
+<script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">Presupuesto</p>
+
+               
+                  
+            </button>
+            </div>
+  <!--  afacturacion! -->
+
+            <div class="container-menu" >
+                <button id="mensaje-btn" class="btn"> 
+                 
+               
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/ytklkgsc.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text">    Facturacion</p>
+
+               
+                  
+            </button>
+            </div>
+            
+              <!-- control de gastos! -->
+         
+                <div class="container-menu" >
+                <button id="Pedidos-btn" class="btn"> 
+
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/rezibkiy.json"
+                        trigger="hover"
+                        style="width:30px ;height:30px">
+                    </lord-icon>
+            <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                <p id="menu-text"> Pedidos</p>
+
+               
+                  
+            </button>
+            </div>
+        <!-- control de gastos! -->
+             <div class="container-menu" >
+                <button id="controlGastos-btn" class="btn"> 
+                 
+     <img src="../img/IconGastos.png"  style="width:30px ;height:30px">
+                <p id="menu-text">Control</p>
+
+               
+                  
+            </button>
+            </div>     
+  <!-- config! -->
+   <div class="container-menu" >
+                <button id="administrador-btn" class="btn"> 
+                 
+         <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                <p id="menu-text">Administrador</p>
+
+               
+                  
+            </button>
+            </div>
+            
+            <div class="container-menu" >
+                <button id="config-btn" class="btn"> 
+                 
+                    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+                    <lord-icon
+                        src="https://cdn.lordicon.com/lecprnjb.json"
+                        trigger="hover"
+                        style="width:30px;height:30px">
+                    </lord-icon>
+                       
+                   
+                <p id="menu-text">Configuracion</p>
+
+               
+                  
+            </button>
+            </div>
+           
+          
+ </div>
+                       
+                    </li>
+                      
+
+                    <div id="soporte">
+                
+                    </div>
+                    </ul>     
+                </div>
+            
+                
+                <button id="boton-menu">
+                    <svg  xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M120-240v-80h720v80H120Zm0-200v-80h720v80H120Zm0-200v-80h720v80H120Z"/></svg>
+               <h1 id="inventary" >Inventary</h1>
+                </button>
+                
+               </div>
+               
+            <div id="contenedor">
+                <h1 id="Inventarioss"> Inventary</h1>
+
+            </div>
+        </div>
+ 
+
+
+    </div>
+         <!-- Botón que activa la ventana -->
+
+
+
+        </nav>
+ <div id="notificacion" class="oculto"></div> 
+
+    
+<div id="contenedor-entero">
+    <div class="header-historial">
+        <div id="container-button" class="nav-tabs"> 
+            <button class="tab-btn active" id="Facturacion">Facturación</button>
+            <button class="tab-btn" id="Pacientes">Pacientes</button>
+            <button class="tab-btn" id="Abonos">Abonos</button>
+        </div>
+        <h3 id="H12">Historial de Movimientos</h3>
+    </div>
+
+    <div id="datos" class="tabla-responsive">
+        </div>
+</div>
+    
+
+   
+
+  
+
+    
+ <script src="/dist/Historial/index.min.js"></script>
+    </body>
+</html>
+

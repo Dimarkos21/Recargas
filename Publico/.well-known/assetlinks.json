@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.inventary.optica",
+    "sha256_cert_fingerprints": ["BC:36:7B:C6:63:09:82:26:AA:AE:B1:4E:A2:4E:F2:3D:A0:A8:CA:46:4C:2C:E3:CC:33:13:85:9D:DF:9D:E3:D1"]
+  }
+}]
