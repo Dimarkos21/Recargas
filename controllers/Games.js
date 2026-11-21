@@ -1,37 +1,70 @@
 const GamesRouter = require('express').Router();
-
-const GameModel = require('../models/Game');
-const roleChecker = require('../middleware/roleChecker'); 
+const express = require('express');
+const crypto = require('crypto');
+const axios = require('axios');
 const mongoose = require('mongoose');
 
+let HttpsProxyAgent = null;
+try {
+    ({ HttpsProxyAgent } = require('https-proxy-agent'));
+} catch (_) {
+    // Se usará conexión directa si https-proxy-agent no está instalado
+}
+
+const GameModel = require('../models/Game');
+const roleChecker = require('../middleware/roleChecker');
 const GamePrincipal = require('../models/GamePrincipal');
-const Productos = require('../models/Product');
 const Billetera_Model = require('../models/Billetera');
 const Producto_Model = require('../models/Product');
 const Trasferencia_Model = require('../models/PagoModel');
-const {userExtractor} = require("../middleware/auth");
-const Tasa = require("../models/tasap2p"); // Ajusta la ruta a tu modelo
+const { userExtractor } = require('../middleware/auth');
+const Tasa = require('../models/tasap2p');
+
+const esWorkerPrincipal = () => !process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === '0';
+
+const redondear2 = (valor) => {
+    const num = Number(valor);
+    if (!Number.isFinite(num)) return 0;
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+};
+
+// BILLETERA
+GamesRouter.get("/TotalBilletera", userExtractor, async (request, response) => {
+    try {
+        const user = request.user;
+        if (!user) {
+            return response.status(401).json({ error: 'Usuario no autenticado' });
+        }
+
+        const billetera = await Billetera_Model.findOne({ usuario: user._id }).lean();
+        return response.json({
+            Saldo: billetera ? billetera.saldo : 0
+        });
+    } catch (error) {
+        console.error("DETALLE DEL ERROR EN BACKEND:", error);
+        return response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
+    }
+});
 
 // Ruta para manejar las solicitudes GET a /api/todos
 GamesRouter.get("/", async (request, response) => {
     try {
+        const nombresBuscados = ['arena breakout', 'call of duty', "Discord", "genshin impact", "Oxide", "AceCraft", "Asphalt 9"];
 
-       
-const nombresBuscados = ['arena breakout', 'call of duty', "Discord" , "genshin impact", "Oxide","AceCraft","Asphalt 9"];
+        // Creamos un patrón que une los nombres con un OR lógico (|) y la 'i' al final para ignorar mayúsculas/minúsculas
+        const regexPattern = new RegExp(nombresBuscados.join('|'), 'i');
 
-// Creamos un patrón que une los nombres con un OR lógico (|) y la 'i' al final para ignorar mayúsculas/minúsculas
-const regexPattern = new RegExp(nombresBuscados.join('|'), 'i');
-
-const juegos = await GamePrincipal.find({
-    name: { $regex: regexPattern }
-});
+        const juegos = await GamePrincipal.find({
+            name: { $regex: regexPattern }
+        });
         response.json(juegos);
     } catch (error) {
         response.status(500).json({ error: 'An error occurred' });
     }
 });
-// CALCULO DE COSTES  Y GANACIA
-function CalculoComisionConIvaReal(costoUsdt, gananciaPct, tasaP2p, comisionPasarela = 0.03, iva = 0.16) {
+
+// CALCULO DE COSTES Y GANANCIA (Única fuente de verdad para catálogo y cobros)
+function CalculoComisionConIvaReal(costoUsdt, gananciaPct, tasaP2p, comisionPasarela = 0.02, iva = 0.16) {
     // 1. Lo que te cuesta + tu ganancia limpia en USDT
     let usdtNetoObjetivo = costoUsdt * (1 + gananciaPct);
 
@@ -42,20 +75,94 @@ function CalculoComisionConIvaReal(costoUsdt, gananciaPct, tasaP2p, comisionPasa
     let gananciaBs = (costoUsdt * gananciaPct) * tasaP2p;
     let ivaSobreGanancia = gananciaBs * iva;
 
-    // 4. Sumamos lo de Binance + el IVA de tu servicio, y dividimos entre el factor de la pasarela (3%)
+    // 4. Sumamos lo de Binance + el IVA de tu servicio, y dividimos entre el factor de la pasarela
     let totalNecesario = bsParaBinance + ivaSobreGanancia;
     let precioFinalBs = totalNecesario / (1 - comisionPasarela);
 
     return Number(precioFinalBs.toFixed(2));
 }
-// BINANCE TASA P2P 
 
+function calcularPreciosProducto(producto, tasaBs) {
+    const costoBase = Number(producto?.cost_price_usd) > 0
+        ? Number(producto.cost_price_usd)
+        : Number(producto?.sell_price_usd) || 0;
 
+    const precioProveedorUsd = Number(producto?.sell_price_usd) > 0
+        ? Number(producto.sell_price_usd)
+        : costoBase;
+
+    if (costoBase <= 0 || !Number.isFinite(tasaBs) || tasaBs <= 0) {
+        return {
+            costoBase: 0,
+            precioProveedorUsd: 0,
+            precioFinalUsd: 0,
+            precioFinalBs: 0
+        };
+    }
+
+    const margenDeseado = 0.20;    // 20% de ganancia neta en USDT sobre el costo
+    const comisionPasarela = 0.02; // 2% comisión de pasarela (Débito Inmediato)
+    const ivaComision = 0.16;      // 16% IVA aplicado sobre la ganancia
+
+    const precioFinalBs = CalculoComisionConIvaReal(
+        costoBase,
+        margenDeseado,
+        tasaBs,
+        comisionPasarela,
+        ivaComision
+    );
+    const precioFinalUsd = redondear2(precioFinalBs / tasaBs);
+
+    return {
+        costoBase,
+        precioProveedorUsd,
+        precioFinalUsd,
+        precioFinalBs
+    };
+}
+
+// BINANCE TASA P2P
 let ultimaTasaAltaConocida = null;
 
+// Vigilante que guarda la tasa en MongoDB cada 5 minutos
+const iniciarVigilanteTasaP2P = () => {
+    if (!esWorkerPrincipal()) return;
 
+    const INTERVALO_MS = 5 * 60 * 1000; // 5 minutos
+    let ejecutando = false;
 
-// 1. Consulta Binance P2P y sus respaldos
+    const actualizarEnMongo = async () => {
+        if (ejecutando) return;
+        ejecutando = true;
+
+        try {
+            const nuevaTasa = await consultarTasaExterna();
+            if (!Number.isFinite(nuevaTasa) || nuevaTasa <= 0) return;
+
+            await Tasa.findOneAndUpdate(
+                { nombre: "P2P" },
+                {
+                    $set: {
+                        valor: nuevaTasa,
+                        ultimaActualizacion: new Date()
+                    }
+                },
+                { upsert: true, new: true }
+            );
+
+            ultimaTasaAltaConocida = nuevaTasa;
+        } catch (error) {
+            console.error("❌ Error guardando tasa P2P en MongoDB:", error.message);
+        } finally {
+            ejecutando = false;
+        }
+    };
+
+    actualizarEnMongo(); // Primera carga al iniciar
+    const intervalo = setInterval(actualizarEnMongo, INTERVALO_MS);
+    intervalo.unref();
+};
+
 async function consultarTasaExterna() {
     const TIMEOUT_MS = 3500;
 
@@ -94,8 +201,8 @@ async function consultarTasaExterna() {
         const payload = {
             asset: "USDT",
             fiat: "VES",
-            tradeType: "BUY", // Tú compras USDT
-            transAmount: "50000", // Tu monto habitual
+            tradeType: "BUY",
+            transAmount: "50000",
             payTypes: ["Banesco", "PagoMovil"],
             page: 1,
             rows: 10
@@ -103,7 +210,11 @@ async function consultarTasaExterna() {
 
         const response = await fetchConTimeout(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            },
             body: JSON.stringify(payload)
         });
 
@@ -128,9 +239,18 @@ async function consultarTasaExterna() {
 
     // 2. Respaldo 1: Cotizave
     try {
-        const url = "https://cotizave.com/v2/fx/VE/rates";
+        const apiKey = process.env.cotizaveP2PUSDT;
+        if (!apiKey) {
+            throw new Error("Falta variable de entorno cotizaveP2PUSDT");
+        }
+
+        const url = "https://api.cotizave.com/v2/fx/VE/rates/ve-binance";
         const response = await fetchConTimeout(url, {
-            headers: { "Accept": "application/json" }
+            method: "GET",
+            headers: {
+                "Accept": "application/json",
+                "X-API-Key": apiKey
+            }
         });
 
         if (!response.ok) {
@@ -138,11 +258,7 @@ async function consultarTasaExterna() {
         }
 
         const data = await response.json();
-        const rateObj = Array.isArray(data?.rates)
-            ? data.rates.find(r => r.market === "p2p" || String(r.id).includes("binance"))
-            : null;
-
-        const baseRate = parseFloat(rateObj?.sell ?? rateObj?.mid ?? rateObj?.price ?? data?.usdt_ves);
+        const baseRate = parseFloat(data?.sell ?? data?.mid ?? data?.price);
         if (!Number.isFinite(baseRate) || baseRate <= 0) {
             throw new Error("Dato inválido en Respaldo 1");
         }
@@ -154,10 +270,11 @@ async function consultarTasaExterna() {
         console.warn("Fallo en respaldo 1, probando respaldo 2:", error.message);
     }
 
-    // 3. Respaldo 2: Segunda API alternativa USDT/VES
+    // 3. Respaldo 2: CriptoYa
     try {
-        const url = "https://api.respaldo-usdt-ves.ejemplo/v1/high-rate";
+        const url = "https://criptoya.com/api/binancep2p/usdt/ves/100";
         const response = await fetchConTimeout(url, {
+            method: "GET",
             headers: { "Accept": "application/json" }
         });
 
@@ -166,7 +283,7 @@ async function consultarTasaExterna() {
         }
 
         const data = await response.json();
-        const candidato = parseFloat(data?.high ?? data?.price ?? data?.rate ?? data?.usdt);
+        const candidato = parseFloat(data?.ask ?? data?.totalAsk ?? data?.bid);
         if (!Number.isFinite(candidato) || candidato <= 0) {
             throw new Error("Dato inválido en Respaldo 2");
         }
@@ -175,10 +292,10 @@ async function consultarTasaExterna() {
         ultimaTasaAltaConocida = tasaRespaldo2;
         return tasaRespaldo2;
     } catch (error) {
-        console.warn("Fallo en respaldo 2, probando respaldo 3 (caché):", error.message);
+        console.warn("Fallo en respaldo 2, usando respaldo 3 (caché):", error.message);
     }
 
-    // 4. Respaldo 3: Última tasa conocida en memoria
+    // 4. Respaldo 3: Última tasa válida en memoria
     if (Number.isFinite(ultimaTasaAltaConocida) && ultimaTasaAltaConocida > 0) {
         return ultimaTasaAltaConocida;
     }
@@ -187,46 +304,7 @@ async function consultarTasaExterna() {
     return null;
 }
 
-// 2. Vigilante que guarda la tasa en MongoDB cada 5 minutos
-const iniciarVigilanteTasaP2P = () => {
-    if (typeof esWorkerPrincipal === 'function' && !esWorkerPrincipal()) return;
-
-    const INTERVALO_MS = 5 * 60 * 1000; // 5 minutos
-    let ejecutando = false;
-
-    const actualizarEnMongo = async () => {
-        if (ejecutando) return;
-        ejecutando = true;
-
-        try {
-            const nuevaTasa = await consultarTasaExterna();
-            if (!Number.isFinite(nuevaTasa) || nuevaTasa <= 0) return;
-
-            await Tasa.findOneAndUpdate(
-                { nombre: "P2P" },
-                {
-                    $set: {
-                        valor: nuevaTasa,
-                        ultimaActualizacion: new Date()
-                    }
-                },
-                { upsert: true, new: true }
-            );
-
-            ultimaTasaAltaConocida = nuevaTasa;
-        } catch (error) {
-            console.error("❌ Error guardando tasa P2P en MongoDB:", error.message);
-        } finally {
-            ejecutando = false;
-        }
-    };
-
-    actualizarEnMongo(); // Primera carga al iniciar
-    const intervalo = setInterval(actualizarEnMongo, INTERVALO_MS);
-    intervalo.unref();
-};
-
-// 3. Función principal: devuelve el valor guardado en MongoDB
+// Devuelve el valor guardado en MongoDB
 async function obtenerTasaBinanceAlta() {
     try {
         const registro = await Tasa.findOne({ nombre: "P2P" }).lean();
@@ -263,335 +341,160 @@ async function obtenerTasaBinanceAlta() {
     return null;
 }
 
-
-
-
-
-
-// Ruta para manejar las solicitudes GET a /api/todos/:id
-// Ruta para buscar un juego específico por su nombre
-// Ruta para obtener la vista o los datos del producto específico
-
+// Ruta para obtener los productos de un juego específico
 GamesRouter.get("/1/:name", async (request, response) => {
     try {
-        const gameName = request.params.name; // Recibe "307"
-        
-        // 1. Buscamos el juego principal usando el external_id numérico
-        const juego = await GamePrincipal.findOne({ 
-            external_id: Number(gameName)
-        });
-    
-        if (!juego) {
-            return response.status(404).json({ error: 'Juego principal no encontrado' });
-        }
-        
-        // 2. Usamos juego._id para buscar la subcategoría
-        const subcategoria = await GameModel.findOne({ game_principal: juego._id });
+        const externalIdNum = Number(request.params.name);
 
+        if (!Number.isInteger(externalIdNum) || externalIdNum <= 0) {
+            return response.status(400).json({ error: "ID de juego inválido" });
+        }
+
+        // 1. Buscamos el juego principal usando el external_id numérico
+        const juego = await GamePrincipal.findOne({ external_id: externalIdNum }).lean();
+        if (!juego) {
+            return response.status(404).json({ error: "Juego principal no encontrado" });
+        }
+
+        // 2. Buscamos la subcategoría vinculada al juego principal
+        const subcategoria = await GameModel.findOne({ game_principal: juego._id }).lean();
         if (!subcategoria) {
-            return response.status(404).json({ error: 'Subcategoría no encontrada' });
+            return response.status(404).json({ error: "Subcategoría no encontrada" });
         }
 
         // 3. Buscamos los productos disponibles usando el ID de la subcategoría
-        const productos = await Productos.find({ 
-            category_id: subcategoria.external_id, 
-            is_available: true 
-        });
-
-        if (!productos || productos.length === 0) {
-            return response.status(404).json({ error: 'No hay productos disponibles' });
-        }
-
-        // --- 4. CONSULTAR TASA DE BINANCE P2P EN TIEMPO REAL CON TU FUNCIÓN ---
-        let tasaProtegida = 1082.30; // Tasa de respaldo por si falla la red
-        const tasaBinanceReal = await obtenerTasaBinanceAlta();
-        
-        if (tasaBinanceReal && tasaBinanceReal > 0) {
-            tasaProtegida = tasaBinanceReal;
-        } else {
-            console.warn("⚠️ Usando tasa de respaldo debido a fallo en Binance P2P");
-        }
-
-        // --- 5. CALCULAR EL PRECIO EN BS CON .MAP() ---
-        const margenDeseado = 0.20;    // 20% de ganancia neta en USDT sobre el costo
-        const comisionPasarela = 0.02; // 2% comisión real de R4 Conecta (Débito Inmediato)
-        const ivaComision = 0.16;      // 16% IVA aplicado exclusivamente sobre tu comisión
-
-        const productosConPrecioBs = productos.map(prod => {
-            // Tomamos el costo en USDT del producto (ej. 0.814186)
-            const costoUsdt = Number(prod.cost_price_usd) || 0; 
-
-            if (costoUsdt <= 0) {
-                return {
-                    ...prod.toObject(),
-                    precio_usd: 0,
-                    precio_bs: '0,00'
-                };
-            }
-
-            // Aplicamos la fórmula matemática financiera (Gross-up)
-            const usdtObjetivo = costoUsdt * (1 + margenDeseado);
-            const bsParaBinance = usdtObjetivo * tasaProtegida;
-            
-            const gananciaBs = (costoUsdt * margenDeseado) * tasaProtegida;
-            const ivaSobreGanancia = gananciaBs * ivaComision;
-
-            const precioFinalBs = (bsParaBinance + ivaSobreGanancia) / (1 - comisionPasarela);
-            const precioFinalUsd = precioFinalBs / tasaProtegida;
-
-            // Devolvemos el objeto del producto actualizado con su precio en bolívares e USD
-            return {
-                ...prod.toObject(), // Convierte el documento Mongoose a un objeto plano
-                precio_usd: Number(precioFinalUsd.toFixed(2)),
-                precio_bs:  precioFinalBs.toLocaleString('es-VE', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                }) 
-            };
-        });
-
-        // 6. Devolvemos la respuesta final limpia al cliente
-        response.json({ 
-            nombre: juego.name, 
-            tasa_referencia_usdt: Number(tasaProtegida.toFixed(2)),
-            productos: productosConPrecioBs 
-        }); 
-
-    } catch (error) {
-        console.error("DETALLE DEL ERROR EN BACKEND:", error);
-        response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
-    }
-});
-
-// Probando con tus 60 bonos ($0.81584):
-console.log(CalculoComisionConIvaReal(0.81584, 0.20, obtenerTasaBinanceAlta() )); 
-// Resultado: 1096.67 Bs.
-// Ruta para manejar las solicitudes GET a /api/todos/:id
-// Ruta para buscar un juego específico por su nombre
-// Ruta para obtener la vista o los datos del producto específico
-
-GamesRouter.get("/1/:name", async (request, response) => {
-    try {
-        const gameName = request.params.name; // Recibe "307"
-        
-        // 1. Buscamos el juego principal usando el external_id numérico
-        const juego = await GamePrincipal.findOne({ 
-            external_id: Number(gameName)
-        });
-    
-        if (!juego) {
-            return response.status(404).json({ error: 'Juego principal no encontrado' });
-        }
-        
-        // 2. Usamos juego._id para buscar la subcategoría
-        const subcategoria = await GameModel.findOne({ game_principal: juego._id });
-
-        if (!subcategoria) {
-            return response.status(404).json({ error: 'Subcategoría no encontrada' });
-        }
-
-        // 3. Buscamos los productos disponibles usando el ID de la subcategoría
-        const productos = await Productos.find({ 
-            category_id: subcategoria.external_id, 
-            is_available: true 
-        });
-
-        if (!productos || productos.length === 0) {
-            return response.status(404).json({ error: 'No hay productos disponibles' });
-        }
-
-        // --- 4. CONSULTAR TASA DE BINANCE P2P EN TIEMPO REAL ---
-        let tasaProtegida = 1082.30; // Tasa de respaldo actualizada por si falla la red
-        try {
-            const p2pResponse = await axios.post("https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search", {
-                asset: "USDT",
-                fiat: "VES",
-                tradeType: "BUY", // Tú compras USDT
-                transAmount: "50000", // Monto promedio de tus lotes en Bs
-                payTypes: ["Banesco", "PagoMovil"], // Tu banco
-                page: 1,
-                rows: 5
-            }, { timeout: 8000 }); // Evita bloqueos si Binance tarda
-
-            const ofertas = p2pResponse.data?.data;
-            if (Array.isArray(ofertas) && ofertas.length >= 5) {
-                let precios = ofertas.map(item => parseFloat(item.adv.price)).filter(Number.isFinite);
-                // Promediamos las filas 3, 4 y 5 para evitar tasas trampa o bots
-                let fila3a5 = precios.slice(2, 5);
-                if (fila3a5.length > 0) {
-                    let promedio = fila3a5.reduce((a, b) => a + b, 0) / fila3a5.length;
-                    
-                    // Aplicamos tu colchón de seguridad del 1.5% contra la volatilidad (1.015)
-                    tasaProtegida = promedio * 1.015;
-                }
-            }
-        } catch (p2pError) {
-            console.error("No se pudo conectar a Binance P2P, usando tasa de respaldo:", p2pError.message);
-        }
-
-        // --- 5. CALCULAR EL PRECIO EN BS CON .MAP() ---
-        const margenDeseado = 0.20;    // 20% de ganancia neta en USDT sobre el costo
-        const comisionPasarela = 0.02; // 2% comisión real de R4 Conecta (Débito Inmediato)
-        const ivaComision = 0.16;      // 16% IVA aplicado exclusivamente sobre tu comisión
-
-        const productosConPrecioBs = productos.map(prod => {
-            // Tomamos el costo en USDT del producto (ej. 0.814186)
-            const costoUsdt = Number(prod.cost_price_usd) || 0; 
-
-            if (costoUsdt <= 0) {
-                return {
-                    ...prod.toObject(),
-                    precio_usd: 0,
-                    precio_bs: '0,00'
-                };
-            }
-
-            // Aplicamos la fórmula matemática financiera (Gross-up)
-            const usdtObjetivo = costoUsdt * (1 + margenDeseado);
-            const bsParaBinance = usdtObjetivo * tasaProtegida;
-            
-            const gananciaBs = (costoUsdt * margenDeseado) * tasaProtegida;
-            const ivaSobreGanancia = gananciaBs * ivaComision;
-
-            const precioFinalBs = (bsParaBinance + ivaSobreGanancia) / (1 - comisionPasarela);
-            const precioFinalUsd = precioFinalBs / tasaProtegida;
-
-            // Devolvemos el objeto del producto actualizado con su precio en bolívares e USD
-            return {
-                ...prod.toObject(), // Convierte el documento Mongoose a un objeto plano
-                precio_usd: Number(precioFinalUsd.toFixed(2)),
-                precio_bs:  precioFinalBs.toLocaleString('es-VE', { 
-                    minimumFractionDigits: 2, 
-                    maximumFractionDigits: 2 
-                }) 
-            };
-        });
-
-        // 6. Devolvemos la respuesta final limpia al cliente
-        response.json({ 
-            nombre: juego.name, 
-            tasa_referencia_usdt: Number(tasaProtegida.toFixed(2)),
-            productos: productosConPrecioBs 
-        }); 
-
-    } catch (error) {
-        console.error("DETALLE DEL ERROR EN BACKEND:", error);
-        response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
-    }
-});
-GamesRouter.get("/TotalBilletera",  userExtractor ,async (request, response) => {
-    try {
-    
-          const user = request.user;
-        if (!user) {
-            return response.status(401).json({ error: 'Usuario no autenticado' });
-        }
-        console.log(user)
-        // 1. Buscamos el juego principal usando el external_id numérico
-        const Billetera = await Billetera_Model.findOne({ 
-            usuario : user._id
+        const productos = await Producto_Model.find({
+            category_id: subcategoria.external_id,
+            is_available: true
         }).lean();
-    console.log(Billetera)
-        if (!Billetera) {
-            return response.status(404).json({ error: 'Juego principal no encontrado' });
+
+        if (!productos.length) {
+            return response.status(404).json({ error: "No hay productos disponibles" });
         }
-        
 
-        // 6. Devolvemos la respuesta final limpia al cliente
-        response.json({ 
-           Saldo : Billetera.saldo,
-        }); 
+        // 4. Obtenemos la tasa desde el sistema de vigilancia/MongoDB/respaldos
+        const TASA_RESPALDO_DEFAULT = 1082.30;
+        const tasaBinanceReal = await obtenerTasaBinanceAlta();
+        const usandoRespaldo = !(Number.isFinite(tasaBinanceReal) && tasaBinanceReal > 0);
+        const tasaProtegida = usandoRespaldo ? TASA_RESPALDO_DEFAULT : Number(tasaBinanceReal);
 
+        if (usandoRespaldo) {
+            console.warn("⚠️ Usando tasa de respaldo por fallo al obtener tasa P2P");
+        }
+
+        // 5. Cálculo unificado de precios
+        const productosConPrecioBs = productos.map((prod) => {
+            const { precioFinalUsd, precioFinalBs } = calcularPreciosProducto(prod, tasaProtegida);
+
+            if (precioFinalBs <= 0) {
+                return {
+                    ...prod,
+                    precio_usd: 0,
+                    precio_bs: "0,00"
+                };
+            }
+
+            return {
+                ...prod,
+                precio_usd: precioFinalUsd,
+                precio_bs: precioFinalBs.toLocaleString("es-VE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                })
+            };
+        });
+
+        // 6. Respuesta final
+        return response.json({
+            nombre: juego.name,
+            tasa_referencia_usdt: Number(tasaProtegida.toFixed(2)),
+            productos: productosConPrecioBs
+        });
     } catch (error) {
         console.error("DETALLE DEL ERROR EN BACKEND:", error);
-        response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
+        return response.status(500).json({ error: "Ocurrió un error", detalle: error.message });
     }
 });
-GamesRouter.post("/PlayerID", userExtractor,async (request, response) => {
-    try {
-        // 1. Extraemos los datos que envía tu cliente (frontend)
-        const {PlayerID, JuegoID } = request.body;
 
-        // 2. Hacemos la petición con await y la estructura correcta de Axios
+GamesRouter.post("/PlayerID", userExtractor, async (request, response) => {
+    try {
+        const { PlayerID, JuegoID } = request.body;
+
         const { data } = await axios.post(
-            "https://shop2topup.com/api/endpoints/v1/player/validate", // URL completa del servicio externo
+            "https://shop2topup.com/api/endpoints/v1/player/validate",
             {
                 sub_category_id: Number(JuegoID),
-                player_id: Number(PlayerID), // Usamos el que envió el cliente dinámicamente
-        
+                player_id: Number(PlayerID),
             },
             {
                 headers: {
-                    "Authorization": `Bearer ${ process.env.SHOP2TOPUP_API_KEY}`,
+                    "Authorization": `Bearer ${process.env.SHOP2TOPUP_API_KEY}`,
                     "Content-Type": "application/json"
                 }
             }
         );
 
-        // 3. Devolvemos la respuesta limpia al cliente de tu web
-        return response.json({ 
+        return response.json({
             success: true,
-            playerInfo: data 
+            playerInfo: data
         });
-
     } catch (error) {
         console.error("DETALLE DEL ERROR EN BACKEND:", error.response?.data || error.message);
-        
-        // Es mejor capturar el error exacto que devuelve la API externa si existe
-        return response.status(500).json({ 
-            error: 'Ocurrió un error al validar el jugador', 
-            detalle: error.response?.data || error.message 
+
+        return response.status(500).json({
+            error: 'Ocurrió un error al validar el jugador',
+            detalle: error.response?.data || error.message
         });
     }
 });
-// CIOMZPRAS Pagomovil y o Billetera 
- 
 
-
-
-GamesRouter.get("/Ordenes_Recargas",  userExtractor ,async (request, response) => {
-    try {
-    
-          const user = request.user;
-        if (!user) {
-            return response.status(401).json({ error: 'Usuario no autenticado' });
-        }
-  
-        // 1. Buscamos el juego principal usando el external_id numérico
-        const Transferencia = await Trasferencia_Model.find({ 
-            responsable : user._id,
-            estatus: { $ne: 'OTP_SOLICITADO' }
-        }).lean();
- 
-        if (!Transferencia) {
-            return response.status(404).json({ error: 'Sin ordenes.' });
-        }
-        
-
-        // 6. Devolvemos la respuesta final limpia al cliente
-        response.json({ 
-   Transferencia
-        }); 
-
-    } catch (error) {
-        console.error("DETALLE DEL ERROR EN BACKEND:", error);
-        response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
-    }
-});
-GamesRouter.post("/Compra",userExtractor, async (request, response) => {
+// COMPRAS Pagomovil y/o Billetera
+GamesRouter.get("/Ordenes_Recargas", userExtractor, async (request, response) => {
     try {
         const user = request.user;
         if (!user) {
             return response.status(401).json({ error: 'Usuario no autenticado' });
         }
 
+        const Transferencia = await Trasferencia_Model.find({
+            responsable: user._id,
+            estatus: { $ne: 'OTP_SOLICITADO' }
+        }).lean();
+
+        return response.json({
+            Transferencia: Transferencia || []
+        });
+    } catch (error) {
+        console.error("DETALLE DEL ERROR EN BACKEND:", error);
+        return response.status(500).json({ error: 'Ocurrió un error', detalle: error.message });
+    }
+});
+
+GamesRouter.post("/Compra", userExtractor, async (request, response) => {
+    let saldoDescontado = 0;
+    let userIdActual = null;
+
+    try {
+        const user = request.user;
+        if (!user) {
+            return response.status(401).json({ error: 'Usuario no autenticado' });
+        }
+        userIdActual = user._id;
 
         // 1. Extraemos y validamos los datos que envía el cliente
         const { Metodo, PlayerID, JuegoID, Cantidad } = request.body;
-    
-        if (!Metodo || !PlayerID || !JuegoID || !Cantidad) {
+
+        if (!Metodo || !PlayerID || !JuegoID || Cantidad === undefined) {
             return response.status(400).json({ error: 'Faltan datos obligatorios en la solicitud' });
         }
+
+        if (!validarCantidadEntera(Cantidad)) {
+            return response.status(400).json({
+                error: `La cantidad debe ser un número entero entre 1 y ${MAX_CANTIDAD_POR_ORDEN}`
+            });
+        }
+
+        const cantidadEntera = Number(Cantidad);
 
         // 2. Validamos primero el jugador con la API externa de Shop2TopUp
         const { data: validacionData } = await axios.post(
@@ -609,69 +512,69 @@ GamesRouter.post("/Compra",userExtractor, async (request, response) => {
         );
 
         if (!validacionData || !validacionData.success) {
-             return response.status(404).json({ error: 'Jugador no válido o ID incorrecto en el juego.' }); 
+            return response.status(404).json({ error: 'Jugador no válido o ID incorrecto en el juego.' });
         }
 
         // 3. Lógica según el método de pago
         if (Metodo === "Pagomovil") {
-            // TODO: Implementar lógica de Pagomovil si lo requieres luego
             return response.status(400).json({ error: 'Método Pagomovil no implementado todavía' });
-
-
-
-
-
-
-
-
-
-
-
-        }
-        
-        else if (Metodo === "Billetera") {
-            console.log(user, "usuario presente");
-
-            // Buscar la billetera del usuario
-            const Billetera_Money = await Billetera_Model.findOne({ usuario: user._id });
-            console.log(Billetera_Money);
-            if (!Billetera_Money) {
-                return response.status(404).json({ error: 'Billetera no encontrada para este usuario' });
-            }
-
+        } else if (Metodo === "Billetera") {
             // Buscar el producto en tu base de datos para saber el precio
             const Producto = await Producto_Model.findOne({ external_id: JuegoID });
             if (!Producto) {
                 return response.status(404).json({ error: 'Producto no encontrado en el catálogo.' });
             }
 
-            // Calcular el costo total basado en la cantidad pedida
-            const costoTotal = Number(Producto.sell_price_usd) * Number(Cantidad);
+            const precioUnitarioUsd = redondear2(Producto.sell_price_usd);
+            if (precioUnitarioUsd <= 0) {
+                return response.status(400).json({ error: 'El producto tiene un precio inválido.' });
+            }
 
-            // Verificar si tiene suficiente dinero
-            if (Billetera_Money.saldo < costoTotal) {
-                return response.status(400).json({ 
-                    error: 'Sin Dinero en la billetera', 
-                    saldoActual: Billetera_Money.saldo,
+            const costoTotal = redondear2(precioUnitarioUsd * cantidadEntera);
+
+            // 4. Descuento atómico ANTES de llamar al proveedor (evita doble gasto por concurrencia)
+            const billeteraActualizada = await Billetera_Model.findOneAndUpdate(
+                { usuario: user._id, saldo: { $gte: costoTotal } },
+                [
+                    {
+                        $set: {
+                            saldo: {
+                                $round: [{ $subtract: ['$saldo', costoTotal] }, 2]
+                            }
+                        }
+                    }
+                ],
+                { new: true }
+            );
+
+            if (!billeteraActualizada) {
+                const billeteraExistente = await Billetera_Model.findOne({ usuario: user._id }).lean();
+                if (!billeteraExistente) {
+                    return response.status(404).json({ error: 'Billetera no encontrada para este usuario' });
+                }
+                return response.status(400).json({
+                    error: 'Sin Dinero en la billetera',
+                    saldoActual: billeteraExistente.saldo,
                     costoRequerido: costoTotal
                 });
             }
 
-            // 4. Generar el UUID único para la idempotencia del pedido en Shop2TopUp
+            saldoDescontado = costoTotal;
+
+            // 5. Generar el UUID único para la idempotencia del pedido en Shop2TopUp
             const orderId = crypto.randomUUID();
 
-            // 5. Hacer el POST para crear el pedido real en Shop2TopUp
+            // 6. Hacer el POST para crear el pedido real en Shop2TopUp
             const { data: orderData } = await axios.post(
                 "https://shop2topup.com/api/endpoints/v1/orders/create",
                 {
                     "order_id": orderId,
                     "sub_category_id": Number(JuegoID),
-                    "quantity": Number(Cantidad),
+                    "quantity": cantidadEntera,
                     "requirements": {
                         "player_id": String(PlayerID),
-                        // Añade aquí campos adicionales si el juego los pide (ej: server)
                     },
-                    "expected_unit_price": Number(Producto.sell_price_usd)
+                    "expected_unit_price": precioUnitarioUsd
                 },
                 {
                     headers: {
@@ -682,130 +585,153 @@ GamesRouter.post("/Compra",userExtractor, async (request, response) => {
             );
 
             if (!orderData || !orderData.success) {
+                await acreditarSaldoBilletera(user._id, saldoDescontado, 'Reversión por rechazo inmediato en /Compra');
+                saldoDescontado = 0;
                 return response.status(500).json({ error: 'Error al procesar el pedido con el proveedor', detalle: orderData });
             }
-const estadoProveedor = orderData.order?.status || 'pending';
-            // 6. Descontar el saldo de la billetera del usuario
-            Billetera_Money.saldo -= costoTotal;
-            await Billetera_Money.save();
 
-            // 7. Guardar el registro de la transacción/pago en tu base de datos (usando tu modelo correctamente)
+            // Saldo comprometido en orden válida: ya no se revierte en el catch
+            saldoDescontado = 0;
+
+            const estadoProveedor = orderData.order?.status || 'pending';
+            const proveedorOrderId = String(orderData.order?.order_id || orderId).trim();
+
+            // 7. Guardar el registro de la transacción/pago en la base de datos
             await Trasferencia_Model.create({
-                telefono: user.telefono || 'N/A', // Ajusta según tu modelo de usuario
+                telefono: user.telefono || 'N/A',
                 cedula: user.cedula || 'N/A',
                 bancoEmisor: 'Billetera Interna',
                 Producto: Producto.name,
-                Cantidad:  Number(Cantidad),
+                juegoId: Number(JuegoID),
+                playerId: String(PlayerID).trim(),
+                Cantidad: cantidadEntera,
+                precioUnitarioUsd: precioUnitarioUsd,
                 monto: costoTotal,
-                concepto: `Compra de ${Cantidad}x ${Producto.name || 'Diamantes/Ítem'} para ID: ${PlayerID}`,
-                referencia: orderData.order?.order_id || orderId,
-                responsable: user.id,
+                concepto: `Compra de ${cantidadEntera}x ${Producto.name || 'Diamantes/Ítem'} para ID: ${PlayerID}`,
+                referencia: proveedorOrderId,
+                responsable: user._id,
                 uuid: orderId,
+                proveedorRequestId: orderId,
+                proveedorOrderId: proveedorOrderId,
+                ordenProcesada: true,
+                utilizado: true,
                 estatus: estadoProveedor === 'completed' ? 'APROBADO' : 'PENDIENTE',
                 tipoTransaccion: 'Billetera'
             });
 
             // 8. Responder con éxito al cliente
-            return response.json({ 
+            return response.json({
                 success: true,
                 mensaje: "Pedido creado con éxito",
-                order: orderData.order 
+                order: orderData.order
             });
-        } 
-        else {
+        } else {
             return response.status(400).json({ error: 'Método de pago no válido' });
         }
-
     } catch (error) {
+        if (saldoDescontado > 0 && userIdActual) {
+            await acreditarSaldoBilletera(
+                userIdActual,
+                saldoDescontado,
+                `Reversión automática por error en /Compra: ${error.message}`
+            ).catch((err) => {
+                console.error(`🚨 [CRÍTICO] No se pudo revertir $${saldoDescontado} al usuario ${userIdActual}:`, err.message);
+            });
+        }
+
         console.error("DETALLE DEL ERROR EN BACKEND:", error.response?.data || error.message);
-        
-        return response.status(500).json({ 
-            error: 'Ocurrió un error al procesar la compra', 
-            detalle: error.response?.data || error.message 
+
+        return response.status(500).json({
+            error: 'Ocurrió un error al procesar la compra',
+            detalle: error.response?.data || error.message
         });
     }
 });
 
 GamesRouter.post("/webhook/shop2topup", async (request, response) => {
     try {
-        // Shop2TopUp envía un evento con la información de la orden
-        const eventData = request.body;
-        
+        // Validación de secreto si está configurado en variables de entorno
+        const webhookSecret = (process.env.SHOP2TOPUP_WEBHOOK_SECRET || '').trim();
+        if (webhookSecret) {
+            const headerSecret = (
+                request.headers['x-webhook-secret'] ||
+                request.headers['authorization'] ||
+                ''
+            ).replace(/^Bearer\s+/i, '').trim();
+
+            if (!compararTokensSeguro(headerSecret, webhookSecret)) {
+                console.warn('⛔ Intento no autorizado en /webhook/shop2topup');
+                return response.status(401).json({ error: 'Webhook no autorizado' });
+            }
+        }
+
+        const eventData = request.body || {};
         console.log("📥 Webhook recibido de Shop2TopUp:", eventData);
 
-        // Dependiendo de la estructura de la API, el evento o estatus viene aquí:
-        // (Ajusta eventData.event o eventData.status según la documentación exacta de sus webhooks)
-        const tipoEvento = eventData.event || eventData.status;
-        const orderId = eventData.order_id || eventData.order?.order_id;
+        const tipoEvento = String(eventData.event || eventData.status || '').toLowerCase().trim();
+        const orderId = String(eventData.order_id || eventData.order?.order_id || '').trim();
 
         if (!orderId) {
             return response.status(400).json({ error: 'Webhook sin order_id válido' });
         }
 
-        // 1. Buscamos la transacción en tu base de datos usando el UUID (referencia/uuid)
-        const transaccion = await Pago.findOne({ uuid: orderId });
-        
+        // 1. Buscamos la transacción tanto por IDs de proveedor (R4) como por uuid (Billetera)
+        const transaccion = await Trasferencia_Model.findOne({
+            $or: [
+                { proveedorOrderId: orderId },
+                { proveedorRequestId: orderId },
+                { uuid: orderId }
+            ]
+        });
+
         if (!transaccion) {
-            console.warn(`⚠️ Transacción con UUID ${orderId} no encontrada en el sistema.`);
+            console.warn(`⚠️ Transacción con order_id ${orderId} no encontrada en el sistema.`);
             return response.status(404).json({ error: 'Transacción no encontrada' });
         }
 
         // 2. Evaluamos el tipo de evento recibido
         if (tipoEvento === 'order.completed' || tipoEvento === 'completed') {
-            // Si ya estaba aprobado, no hacemos nada duplicado
             if (transaccion.estatus !== 'APROBADO') {
-                transaccion.estatus = 'APROBADO';
-                await transaccion.save();
+                await Trasferencia_Model.updateOne(
+                    { _id: transaccion._id, estatus: { $nin: ['APROBADO', 'REEMBOLSADO'] } },
+                    { $set: { estatus: 'APROBADO', proveedorOrderId: orderId } }
+                );
                 console.log(`✅ Pedido ${orderId} marcado como APROBADO.`);
             }
-        } 
-        
-        else if (tipoEvento === 'order.refunded' || tipoEvento === 'failed' || tipoEvento === 'refunded') {
-            // Si el pedido falló o fue reembolsado por el proveedor
-            if (transaccion.estatus !== 'REEMBOLSADO') {
-                transaccion.estatus = 'REEMBOLSADO';
-                await transaccion.save();
+        } else if (['order.refunded', 'failed', 'refunded', 'cancelled', 'canceled', 'rejected'].includes(tipoEvento)) {
+            // Bloqueo atómico para evitar doble acreditación en webhooks repetidos
+            const txReembolsada = await Trasferencia_Model.findOneAndUpdate(
+                { _id: transaccion._id, estatus: { $ne: 'REEMBOLSADO' } },
+                {
+                    $set: {
+                        estatus: 'REEMBOLSADO',
+                        proveedorOrderId: orderId,
+                        detalleError: `Webhook proveedor (${tipoEvento}). Saldo acreditado en billetera.`
+                    }
+                },
+                { new: true }
+            );
 
-                // 💰 Devolvemos el dinero automáticamente a la billetera del usuario
-                await Billetera_Model.findOneAndUpdate(
-                    { usuario: transaccion.responsable },
-                    { $inc: { saldo: transaccion.monto } } // Suma de vuelta los USD descontados
+            if (txReembolsada) {
+                await acreditarSaldoBilletera(
+                    txReembolsada.responsable,
+                    redondear2(txReembolsada.monto),
+                    `Webhook Shop2TopUp (${tipoEvento}) - Orden ${orderId}`
                 );
-
-                console.log(`🔄 Pedido ${orderId} reembolsado. Se devolvieron $${transaccion.monto} al usuario ${transaccion.responsable}.`);
+                console.log(`🔄 Pedido ${orderId} reembolsado. Se devolvieron $${txReembolsada.monto} al usuario ${txReembolsada.responsable}.`);
             }
         }
 
-        // Respondemos siempre con 200 OK para que Shop2TopUp sepa que recibimos el aviso
         return response.json({ received: true });
-
     } catch (error) {
         console.error("❌ Error procesando el Webhook:", error.message);
         return response.status(500).json({ error: 'Error interno procesando webhook' });
     }
 });
 
-
-
-
-// PAGOMOVIL LOGICA BANCO R4 BOLIVARES 2026 |15|11||2026
-
-
-
-// ==========================================
+// =========================================================================
 // CONFIGURACIÓN OFICIAL R4 CONECTA (V3.1)
-// ==========================================
-const express = require('express');
-
-const crypto = require('crypto');
-
-
-
-
-const axios = require('axios');
-
-
-
+// =========================================================================
 
 // =========================================================================
 // 1. CONFIGURACIÓN Y CONSTANTES
@@ -822,12 +748,6 @@ const COOLDOWN_OTP_MS = 30 * 1000; // 30 segundos entre solicitudes OTP por usua
 
 // Cliente HTTP con timeout estricto para evitar bloqueos en el Event Loop
 const httpClient = axios.create({ timeout: 25000 });
-
-const redondear2 = (valor) => {
-    const num = Number(valor);
-    if (!Number.isFinite(num)) return 0;
-    return Math.round((num + Number.EPSILON) * 100) / 100;
-};
 
 const validarCantidadEntera = (cantidad) => {
     const num = Number(cantidad);
@@ -917,7 +837,6 @@ const obtenerIpCliente = (req) => {
         ''
     ).replace(/^::ffff:/, '').trim();
 
-    // Si la conexión directa viene de un proxy local/privado, usar la cabecera reenviada
     const esProxyLocal =
         ipDirecta === '127.0.0.1' ||
         ipDirecta === '::1' ||
@@ -927,30 +846,6 @@ const obtenerIpCliente = (req) => {
 
     return (esProxyLocal && ipHeader) ? ipHeader : (ipDirecta || ipHeader || '0.0.0.0');
 };
-
-/**
- * Consulta de Tasa Oficial BCV (POST /MBbcv)
- * Fórmula HMAC: fechavalor + moneda
- */
-async function PrecioBCV(tokenCommerce) {
-    verificarCredenciales();
-    const commerceToken = (tokenCommerce || R4_COMMERCE).trim();
-    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Caracas' });
-    const tokenAuthorization = generarFirmaR4(`${hoy}USD`, commerceToken);
-
-    const response = await httpClient.post(
-        `${R4_BASE_URL}/MBbcv`,
-        { Moneda: 'USD', Fechavalor: hoy },
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: tokenAuthorization,
-                Commerce: commerceToken
-            }
-        }
-    );
-    return response.data;
-}
 
 // =========================================================================
 // 3. GESTIÓN DE BILLETERA Y DESPACHO IDEMPOTENTE AL PROVEEDOR
@@ -1003,7 +898,6 @@ async function procesarOrdenProveedor(transaccionDoc) {
         };
     }
 
-    // Persistir el requestId antes de llamar al proveedor para garantizar idempotencia en reintentos
     if (!transaccionDoc.proveedorRequestId) {
         transaccionDoc.proveedorRequestId = crypto.randomUUID();
         await transaccionDoc.save();
@@ -1058,7 +952,6 @@ async function procesarOrdenProveedor(transaccionDoc) {
  * Si el proveedor rechaza definitivamente la recarga, acredita el monto en USD a la billetera.
  */
 async function ejecutarDespachoSeguro(transaccionId) {
-    // Candado atómico: evita que webhook /SIMF y respuesta síncrona procesen la misma TX a la vez
     const ordenBloqueada = await Trasferencia_Model.findOneAndUpdate(
         {
             _id: transaccionId,
@@ -1099,7 +992,6 @@ async function ejecutarDespachoSeguro(transaccionId) {
             Boolean(provError.esRechazoDefinitivo) ||
             (statusHttp && statusHttp >= 400 && statusHttp < 500 && statusHttp !== 429);
 
-        // Error de red, timeout o 5xx: NO reembolsar automáticamente porque el proveedor pudo procesarla
         if (!esRechazoDefinitivo) {
             console.error(
                 `🚨 [REVISIÓN MANUAL] Error ambiguo en Shop2TopUp para TX ${ordenBloqueada._id}:`,
@@ -1122,7 +1014,6 @@ async function ejecutarDespachoSeguro(transaccionId) {
             };
         }
 
-        // Rechazo definitivo del proveedor: marcar REEMBOLSADO primero y luego acreditar USD
         const motivoRechazo = provError.response?.data?.message || provError.message;
         const txMarcadaReembolso = await Trasferencia_Model.findOneAndUpdate(
             { _id: ordenBloqueada._id, estatus: { $ne: 'REEMBOLSADO' } },
@@ -1144,7 +1035,6 @@ async function ejecutarDespachoSeguro(transaccionId) {
                     `TX ${txMarcadaReembolso._id} - ${motivoRechazo}`
                 );
             } catch (walletErr) {
-                // Si falla el abono en BD, revertir a REVISION_MANUAL para no perder el reclamo del cliente
                 console.error(`🚨 [CRÍTICO] Falló abono a billetera para TX ${txMarcadaReembolso._id}:`, walletErr.message);
                 await Trasferencia_Model.updateOne(
                     { _id: txMarcadaReembolso._id },
@@ -1173,6 +1063,29 @@ async function ejecutarDespachoSeguro(transaccionId) {
     }
 }
 
+// PROXY DE IP INDEPENDIENTE DESDE DONDE SALE LA SOLICITUD HTTPS
+function crearHttpsAgentProxy(proxyUrl) {
+    if (!proxyUrl) return undefined;
+
+    try {
+        const parsed = new URL(proxyUrl);
+        if (HttpsProxyAgent) {
+            return new HttpsProxyAgent(parsed.toString());
+        }
+        console.warn('⚠️ Instala "https-proxy-agent" para soportar proxy HTTPS correctamente.');
+        return undefined;
+    } catch (err) {
+        console.warn('⚠️ Proxie_URL_SALIDAS_IP inválida, se enviará conexión directa:', err.message);
+        return undefined;
+    }
+}
+
+const r4HttpClient = axios.create({
+    timeout: 25000,
+    httpsAgent: crearHttpsAgentProxy(process.env.Proxie_URL_SALIDAS_IP),
+    proxy: false
+});
+
 // =========================================================================
 // 4. PASO 1: SOLICITAR OTP (POST /GenerarOtp)
 // =========================================================================
@@ -1197,7 +1110,6 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             });
         }
 
-        // Prevención de NoSQL Injection: exigir tipos primitivos escalares
         if (
             (typeof JuegoID !== 'string' && typeof JuegoID !== 'number') ||
             (typeof PlayerID !== 'string' && typeof PlayerID !== 'number')
@@ -1233,7 +1145,6 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             return response.status(400).json({ success: false, error: 'Cédula inválida (ej. V12345678).' });
         }
 
-        // Cooldown anti-spam de OTP por usuario (evita inundación de SMS)
         const solicitudReciente = await Trasferencia_Model.findOne({
             responsable: user._id,
             estatus: 'OTP_SOLICITADO',
@@ -1247,7 +1158,7 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             });
         }
 
-        // 1. Validar jugador en Shop2TopUp (preserva ceros iniciales o IDs alfanuméricos si aplica)
+        // 1. Validar jugador en Shop2TopUp
         const playerIdPayload =
             /^\d+$/.test(playerIdLimpio) && !playerIdLimpio.startsWith('0')
                 ? Number(playerIdLimpio)
@@ -1279,11 +1190,9 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             });
         }
 
-        // 2. Buscar producto y calcular monto exacto en USD y VES
+        // 2. Buscar producto y calcular monto exacto usando la misma fórmula del catálogo
         const Producto = await Producto_Model.findOne({ external_id: juegoIdLimpio });
-        const precioUnitario = redondear2(Producto?.sell_price_usd);
-
-        if (!Producto || precioUnitario <= 0) {
+        if (!Producto) {
             return response.status(404).json({ success: false, error: 'Producto no disponible en el catálogo.' });
         }
 
@@ -1292,8 +1201,13 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             return response.status(503).json({ success: false, error: 'Error al consultar la tasa P2P.' });
         }
 
-        const costoTotalUsd = redondear2(precioUnitario * cantidadEntera);
-        const montoVESNum = redondear2(costoTotalUsd * tasaBinance);
+        const { precioProveedorUsd, precioFinalUsd, precioFinalBs } = calcularPreciosProducto(Producto, tasaBinance);
+        if (precioFinalBs <= 0) {
+            return response.status(404).json({ success: false, error: 'Producto sin precio válido en el catálogo.' });
+        }
+
+        const costoTotalUsd = redondear2(precioFinalUsd * cantidadEntera);
+        const montoVESNum = redondear2(precioFinalBs * cantidadEntera);
         const montoFormateado = montoVESNum.toFixed(2);
 
         if (montoVESNum <= 0) {
@@ -1313,7 +1227,7 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             Cedula: datos.cedula
         });
 
-        const r4Response = await httpClient.post(
+        const r4Response = await r4HttpClient.post(
             `${R4_BASE_URL}/GenerarOtp`,
             {
                 Banco: datos.banco,
@@ -1345,7 +1259,7 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
                 juegoId: Number(juegoIdLimpio),
                 playerId: playerIdLimpio,
                 Cantidad: cantidadEntera,
-                precioUnitarioUsd: precioUnitario,
+                precioUnitarioUsd: precioProveedorUsd,
                 monto: costoTotalUsd,
                 montoVES: montoVESNum,
                 montoVESString: montoFormateado,
@@ -1415,7 +1329,6 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
 
         const limiteVigencia = new Date(Date.now() - TTL_INTENCION_OTP_MS);
 
-        // Bloqueo atómico ANTES de llamar a R4: evita doble cobro por doble clic
         transaccion = await Trasferencia_Model.findOneAndUpdate(
             {
                 _id: intentIdLimpio,
@@ -1451,11 +1364,10 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
                 .trim()
                 .slice(0, 40) || 'Pago de servicio';
 
-        // Firma HMAC /DebitoInmediato: "Banco + Cedula + Telefono + Monto + OTP"
         const stringToSign = `${datos.banco}${datos.cedula}${datos.telefono}${montoExacto}${otpLimpio}`;
         const tokenAuthorization = generarFirmaR4(stringToSign);
 
-        const r4Response = await httpClient.post(
+        const r4Response = await r4HttpClient.post(
             `${R4_BASE_URL}/DebitoInmediato`,
             {
                 Banco: datos.banco,
@@ -1505,7 +1417,7 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
             });
         }
 
-        // CASO 2: EN ESPERA DE RESPUESTA DEL BANCO RECEPTOR (AC00) -> Nunca reintentar cobro
+        // CASO 2: EN ESPERA DE RESPUESTA DEL BANCO RECEPTOR (AC00)
         if (codigoR4 === 'AC00') {
             transaccion.estatus = 'EN_ESPERA_SIMF';
             await transaccion.save();
@@ -1535,7 +1447,6 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
         console.error('❌ Error en /confirmar-c2p:', dataError || error.message);
 
         if (transaccion && transaccion.estatus === 'PROCESANDO_R4') {
-            // Si R4 rechazó explícitamente con 4xx (ej. OTP inválido TKCM), marcar RECHAZADO
             const esRechazoExplicitoR4 =
                 statusHttp && statusHttp >= 400 && statusHttp < 500 && statusHttp !== 408 && statusHttp !== 429;
 
@@ -1555,7 +1466,6 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
                 });
             }
 
-            // Si hubo timeout o error 5xx, no se sabe si el banco debitó -> pasar a espera/revisión
             transaccion.estatus = transaccion.uuid ? 'EN_ESPERA_SIMF' : 'REVISION_MANUAL';
             transaccion.detalleError = `Error de comunicación con R4 durante débito: ${error.message}`;
             await transaccion.save().catch(() => {});
@@ -1637,7 +1547,6 @@ GamesRouter.post('/SIMF', async (request, response) => {
             );
         }
 
-        // Acuse de recibo obligatorio tanto para ACCP como para RJCT/BE01
         return response.status(200).json({ status: true });
     } catch (error) {
         console.error('❌ Error procesando webhook /SIMF:', error.message);
@@ -1663,7 +1572,7 @@ async function consultarEstatusOperacionR4(r4Uuid) {
 
     for (const bodyPayload of payloads) {
         try {
-            const { data } = await httpClient.post(`${R4_BASE_URL}/ConsultarOperaciones`, bodyPayload, { headers });
+            const { data } = await r4HttpClient.post(`${R4_BASE_URL}/ConsultarOperaciones`, bodyPayload, { headers });
             return data;
         } catch (err) {
             ultimoError = err;
@@ -1682,7 +1591,6 @@ async function verificarYProcesarOperacionR4(uuid, userIdPropietario = null) {
     const transaccion = await Trasferencia_Model.findOne(filtro);
     if (!transaccion) return { encontrada: false };
 
-    // Si R4 ya aprobó el débito pero quedó pendiente el despacho al proveedor, completarlo
     if (transaccion.estatus === 'DEBITO_APROBADO' && !transaccion.utilizado) {
         const despacho = await ejecutarDespachoSeguro(transaccion._id);
         return {
@@ -1787,7 +1695,6 @@ GamesRouter.post('/consultar-operacion', userExtractor, async (request, response
 // =========================================================================
 // 8. VIGILANTES AUTOMÁTICOS (R4 CONECTA + PROVEEDOR DE RECARGAS)
 // =========================================================================
-const esWorkerPrincipal = () => !process.env.NODE_APP_INSTANCE || process.env.NODE_APP_INSTANCE === '0';
 
 /**
  * Vigilante 1: Verifica operaciones en espera de R4 (AC00), rescata débitos aprobados
@@ -1898,7 +1805,6 @@ const iniciarVigilanteOrdenesProveedor = () => {
         ejecutando = true;
 
         try {
-            // Retrocompatible: busca por proveedorOrderId o por uuid (para órdenes previas al cambio de esquema)
             const ordenesPendientes = await Trasferencia_Model.find({
                 estatus: 'PENDIENTE',
                 utilizado: true,
@@ -2026,6 +1932,7 @@ const iniciarVigilanteOrdenesProveedor = () => {
 };
 
 iniciarVigilantePendientesR4();
-iniciarVigilanteOrdenesProveedor();iniciarVigilanteTasaP2P()
+iniciarVigilanteOrdenesProveedor();
+iniciarVigilanteTasaP2P();
 
 module.exports = GamesRouter;
