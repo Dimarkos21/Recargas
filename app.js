@@ -105,7 +105,7 @@ passport.deserializeUser(function(user, cb) {
 // ==========================================
 // 3. RUTAS DE GOOGLE OAUTH
 // ==========================================
-app.get('/auth/google', 
+app.get('https://www.scorpiongaming.com.ve/auth/google', 
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
