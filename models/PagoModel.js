@@ -3,15 +3,10 @@ const mongoose = require('mongoose');
 const pagoSchema = new mongoose.Schema({
     referencia: { 
         type: String, 
-        unique: true, // Anti-fraude: MongoDB rechaza duplicados automáticamente
-        sparse: true, // Evita error E11000 cuando aún no hay referencia
         trim: true 
     },
     uuid: {
         type: String,
-        unique: true,
-        sparse: true, // Evita error E11000 antes de recibir el UUID de R4
-        index: true,
         trim: true
     },
     proveedorRequestId: {
@@ -112,6 +107,14 @@ const pagoSchema = new mongoose.Schema({
         type: Boolean, 
         default: false 
     },
+    intentosRescate: {
+        type: Number,
+        default: 0
+    },
+    rescateTardioRealizado: {
+        type: Boolean,
+        default: false
+    },
     fechaPago: { 
         type: Date, 
         default: Date.now 
@@ -120,8 +123,19 @@ const pagoSchema = new mongoose.Schema({
     timestamps: true 
 });
 
-// Índice compuesto para que los vigilantes consulten sin sobrecargar MongoDB Atlas
+// Índices únicos seguros (ignoran null y strings vacíos evitando errores E11000)
+pagoSchema.index(
+    { referencia: 1 },
+    { unique: true, partialFilterExpression: { referencia: { $type: 'string', $gt: '' } } }
+);
+pagoSchema.index(
+    { uuid: 1 },
+    { unique: true, partialFilterExpression: { uuid: { $type: 'string', $gt: '' } } }
+);
+
+// Índices compuestos para que los vigilantes consulten sin sobrecargar MongoDB Atlas
 pagoSchema.index({ estatus: 1, utilizado: 1, createdAt: 1 });
+pagoSchema.index({ estatus: 1, updatedAt: 1 });
 
 // Mantiene el nombre de modelo 'Pago' para seguir apuntando a tu colección actual en MongoDB
 const Pago = mongoose.models.Pago || mongoose.model('Pago', pagoSchema);

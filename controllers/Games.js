@@ -1936,12 +1936,17 @@ GamesRouter.post('/consultar-operacion', userExtractor, async (request, response
 const iniciarVigilantePendientesR4 = () => {
     if (!esWorkerPrincipal()) return;
 
-    const INTERVALO_MS = 60 * 1000;
-    const ANTIGUEDAD_MINIMA_MS = 3 * 60 * 1000;
-    const ANTIGUEDAD_MAXIMA_MS = 24 * 60 * 60 * 1000;
+    const INTERVALO_MS = 5 * 60 * 1000;            // Revisar cada 5 minutos
+    const ARRANQUE_INICIAL_MS = 20 * 1000;         // Primera pasada 20s tras iniciar el servidor
+    const ANTIGUEDAD_MINIMA_MS = 5 * 60 * 1000;    // Esperar 5 min a que llegue el webhook /SIMF
+    const ANTIGUEDAD_MAXIMA_MS = 30 * 60 * 1000;   // Fin de consultas frecuentes en R4 (30 min)
+    const RESCATE_TARDIO_MS = 2 * 60 * 60 * 1000;  // Consulta de respaldo a partir de las 2 horas
+    const EXPIRACION_24H_MS = 24 * 60 * 60 * 1000; // Expirar definitivamente tras 24 horas
+    const MAX_INTENTOS_RESCATE = 5;
+
     let ejecutando = false;
 
-    const intervalo = setInterval(async () => {
+    const ejecutarCiclo = async () => {
         if (ejecutando) return;
         ejecutando = true;
 
@@ -1949,13 +1954,142 @@ const iniciarVigilantePendientesR4 = () => {
             const ahora = Date.now();
             const limiteMinimo = new Date(ahora - ANTIGUEDAD_MINIMA_MS);
             const limiteMaximo = new Date(ahora - ANTIGUEDAD_MAXIMA_MS);
+            const limiteRescateTardio = new Date(ahora - RESCATE_TARDIO_MS);
+            const limiteExpiracion = new Date(ahora - EXPIRACION_24H_MS);
 
-            // 1. Expirar operaciones sin respuesta tras 24h
+            // 1A. Marcar para revisión órdenes colgadas por reinicio en envío a R4 o al proveedor (> 3 min)
             await Trasferencia_Model.updateMany(
                 {
+                    tipoTransaccion: 'DebitoInmediato',
+                    estatus: { $in: ['ENVIANDO_PROVEEDOR', 'PROCESANDO_R4'] },
+                    updatedAt: { $lte: new Date(ahora - 3 * 60 * 1000) }
+                },
+                {
+                    $set: {
+                        estatus: 'REVISION_MANUAL',
+                        detalleError: 'Proceso interrumpido durante comunicación externa. Verificar estado en R4/proveedor antes de reembolsar.'
+                    }
+                }
+            );
+
+            // 1B. Detectar anomalías: órdenes en EN_ESPERA_SIMF sin UUID válido tras 3 minutos
+            await Trasferencia_Model.updateMany(
+                {
+                    tipoTransaccion: 'DebitoInmediato',
                     estatus: 'EN_ESPERA_SIMF',
+                    $or: [{ uuid: { $exists: false } }, { uuid: null }, { uuid: '' }],
+                    updatedAt: { $lte: new Date(ahora - 3 * 60 * 1000) }
+                },
+                {
+                    $set: {
+                        estatus: 'REVISION_MANUAL',
+                        detalleError: 'Operación en espera de SIMF sin UUID de R4 registrado.'
+                    }
+                }
+            );
+
+            // 2. Rescatar órdenes ya aprobadas por R4 (DEBITO_APROBADO) que no llegaron a despacharse
+            const aprobadasSinDespachar = await Trasferencia_Model.find({
+                tipoTransaccion: 'DebitoInmediato',
+                estatus: 'DEBITO_APROBADO',
+                utilizado: { $ne: true },
+                ordenProcesada: { $ne: true },
+                updatedAt: { $lte: new Date(ahora - 60 * 1000) }
+            })
+                .sort({ createdAt: 1 })
+                .limit(10);
+
+            for (const tx of aprobadasSinDespachar) {
+                const intentos = (tx.intentosRescate || 0) + 1;
+
+                if (intentos > MAX_INTENTOS_RESCATE) {
+                    await Trasferencia_Model.updateOne(
+                        { _id: tx._id, estatus: 'DEBITO_APROBADO' },
+                        {
+                            $set: {
+                                estatus: 'REVISION_MANUAL',
+                                detalleError: `Superado límite de ${MAX_INTENTOS_RESCATE} intentos automáticos de despacho.`
+                            }
+                        }
+                    );
+                    continue;
+                }
+
+                try {
+                    const marcado = await Trasferencia_Model.updateOne(
+                        {
+                            _id: tx._id,
+                            estatus: 'DEBITO_APROBADO',
+                            utilizado: { $ne: true },
+                            ordenProcesada: { $ne: true }
+                        },
+                        { $inc: { intentosRescate: 1 } }
+                    );
+                    if (marcado.modifiedCount === 0) continue; // Ya fue tomada por otro proceso
+
+                    await ejecutarDespachoSeguro(tx._id);
+                } catch (err) {
+                    console.error(`❌ Error rescatando despacho TX ${tx._id} (intento ${intentos}):`, err.message);
+                }
+            }
+
+            // 3. Consultar en R4 operaciones pendientes de confirmación (AC00 / EN_ESPERA_SIMF)
+            const pendientes = await Trasferencia_Model.find({
+                tipoTransaccion: 'DebitoInmediato',
+                estatus: 'EN_ESPERA_SIMF',
+                utilizado: { $ne: true },
+                ordenProcesada: { $ne: true },
+                uuid: { $exists: true, $nin: [null, ''] },
+                $or: [
+                    // Tramo 1: Consultas regulares entre el minuto 5 y el minuto 30
+                    { createdAt: { $lte: limiteMinimo, $gte: limiteMaximo } },
+                    // Tramo 2: Rescate garantizado a partir de las 2 horas (incluye órdenes > 24h antes de expirar)
+                    {
+                        createdAt: { $lte: limiteRescateTardio },
+                        rescateTardioRealizado: { $ne: true }
+                    }
+                ]
+            })
+                .sort({ createdAt: 1 })
+                .limit(15);
+
+            for (const tx of pendientes) {
+                const esRescateTardio = tx.createdAt <= limiteRescateTardio;
+                try {
+                    await verificarYProcesarOperacionR4(tx.uuid);
+
+                    // Solo cerramos el rescate tardío si R4 respondió sin error de red/timeout
+                    if (esRescateTardio) {
+                        await Trasferencia_Model.updateOne(
+                            { _id: tx._id },
+                            { $set: { rescateTardioRealizado: true } }
+                        );
+                    }
+                } catch (txError) {
+                    console.error(`❌ Error verificando UUID ${tx.uuid}:`, txError.response?.data || txError.message);
+
+                    // Si falla por red/timeout en el rescate tardío, permitir 1 reintento más antes de cerrar
+                    if (esRescateTardio) {
+                        const fallosTardios = (tx.intentosRescate || 0) + 1;
+                        await Trasferencia_Model.updateOne(
+                            { _id: tx._id },
+                            {
+                                $inc: { intentosRescate: 1 },
+                                ...(fallosTardios >= 2 ? { $set: { rescateTardioRealizado: true } } : {})
+                            }
+                        );
+                    }
+                }
+            }
+
+            // 4. Expirar operaciones sin respuesta tras 24h reales (y solicitudes de OTP abandonadas)
+            await Trasferencia_Model.updateMany(
+                {
+                    tipoTransaccion: 'DebitoInmediato',
+                    estatus: { $in: ['EN_ESPERA_SIMF', 'OTP_SOLICITADO', 'PENDIENTE'] },
                     utilizado: { $ne: true },
-                    createdAt: { $lt: limiteMaximo }
+                    ordenProcesada: { $ne: true },
+                    createdAt: { $lt: limiteExpiracion }
                 },
                 {
                     $set: {
@@ -1964,62 +2098,20 @@ const iniciarVigilantePendientesR4 = () => {
                     }
                 }
             );
-
-            // 2. Marcar para revisión órdenes que quedaron colgadas en ENVIANDO_PROVEEDOR por un reinicio
-            await Trasferencia_Model.updateMany(
-                {
-                    estatus: 'ENVIANDO_PROVEEDOR',
-                    updatedAt: { $lte: new Date(ahora - 3 * 60 * 1000) }
-                },
-                {
-                    $set: {
-                        estatus: 'REVISION_MANUAL',
-                        detalleError: 'Proceso interrumpido mientras se enviaba al proveedor. Verificar antes de reembolsar.'
-                    }
-                }
-            );
-
-            // 3. Rescatar órdenes ya aprobadas por R4 (DEBITO_APROBADO) que no llegaron a enviarse
-            const aprobadasSinDespachar = await Trasferencia_Model.find({
-                estatus: 'DEBITO_APROBADO',
-                utilizado: { $ne: true },
-                updatedAt: { $lte: new Date(ahora - 60 * 1000) }
-            }).limit(10);
-
-            for (const tx of aprobadasSinDespachar) {
-                try {
-                    await ejecutarDespachoSeguro(tx._id);
-                } catch (err) {
-                    console.error(`❌ Error rescatando despacho TX ${tx._id}:`, err.message);
-                }
-            }
-
-            // 4. Consultar en R4 operaciones pendientes de confirmación (AC00 / EN_ESPERA_SIMF)
-            const pendientes = await Trasferencia_Model.find({
-                estatus: 'EN_ESPERA_SIMF',
-                utilizado: { $ne: true },
-                uuid: { $exists: true, $nin: [null, ''] },
-                createdAt: { $lte: limiteMinimo, $gte: limiteMaximo }
-            }).limit(15);
-
-            for (const tx of pendientes) {
-                try {
-                    await verificarYProcesarOperacionR4(tx.uuid);
-                } catch (txError) {
-                    console.error(`❌ Error verificando UUID ${tx.uuid}:`, txError.response?.data || txError.message);
-                }
-            }
         } catch (error) {
             if (esErrorTransitorioMongo(error)) {
-                console.warn('⚠️ Reconexión transitoria con MongoDB Atlas en vigilante R4 (reintentará en 60s).');
+                console.warn('⚠️ Reconexión transitoria con MongoDB Atlas en vigilante R4 (reintentará en 5m).');
             } else {
                 console.error('❌ Error general en vigilante R4:', error.message);
             }
         } finally {
             ejecutando = false;
         }
-    }, INTERVALO_MS);
+    };
 
+    setTimeout(ejecutarCiclo, ARRANQUE_INICIAL_MS);
+
+    const intervalo = setInterval(ejecutarCiclo, INTERVALO_MS);
     intervalo.unref();
 };
 
