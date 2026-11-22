@@ -41,7 +41,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const GOOGLE_CALLBACK_URL = process.env.NODE_ENV === 'production'
-    ? '/auth/google/callback'
+    ? 'https://www.scorpiongaming.com.ve/auth/google/callback'
     : '/auth/google/callback';
 
 passport.use(new GoogleStrategy({
