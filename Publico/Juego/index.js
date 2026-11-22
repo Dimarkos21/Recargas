@@ -288,7 +288,7 @@ Google.addEventListener('click', (e) => {
         e.preventDefault(); // Previene cualquier comportamiento por defecto
         
         // Redirige al navegador del usuario hacia la ruta de tu backend en Node.js
-        window.location.href = 'http://localhost:3006/auth/google';
+        window.location.href = "https://www.scorpiongaming.com.ve/auth/google";
         
 
 

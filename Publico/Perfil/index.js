@@ -54,7 +54,7 @@ const botonGoogle = document.querySelector("#Google");
 if (botonGoogle) {
     botonGoogle.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = "/auth/google";
+        window.location.href = "https://www.scorpiongaming.com.ve/auth/google";
     });
 }
 
