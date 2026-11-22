@@ -46,12 +46,47 @@ const R4_COMMERCE = (process.env.R4_COMMERCE_ID || process.env.R4_COMMERCE_TOKEN
 const R4_WEBHOOK_UUID = (process.env.R4_WEBHOOK_UUID || '').replace(/['"]+/g, '').trim();
 
 const TASA_RESPALDO_DEFAULT = 1082.30;
+const MAX_ANTIGUEDAD_TASA_MS = 30 * 60 * 1000; // 30 minutos de vigencia máxima de tasa en BD
 const MAX_CANTIDAD_POR_ORDEN = 50;
 const TTL_INTENCION_OTP_MS = 10 * 60 * 1000; // 10 minutos de vigencia para usar el OTP
 const COOLDOWN_OTP_MS = 30 * 1000; // 30 segundos entre solicitudes OTP por usuario
 
 // Cliente HTTP con timeout estricto para evitar bloqueos en el Event Loop
 const httpClient = axios.create({ timeout: 25000 });
+
+const MENSAJES_ISO_R4 = {
+    AB01: 'Tiempo de espera agotado con el banco receptor.',
+    AB07: 'El banco receptor se encuentra fuera de línea.',
+    AC01: 'Número de cuenta incorrecto.',
+    AC04: 'La cuenta bancaria se encuentra cancelada.',
+    AC06: 'La cuenta bancaria está bloqueada.',
+    AG01: 'Operación restringida para este tipo de cuenta.',
+    AG09: 'No se pudo completar la liquidación del pago.',
+    AG10: 'Entidad bancaria temporalmente suspendida.',
+    AM02: 'El monto excede el límite permitido por tu banco.',
+    AM04: 'Saldo insuficiente en la cuenta.',
+    AM05: 'Operación duplicada. Espera unos minutos antes de intentar de nuevo.',
+    BE01: 'La cédula o los datos no corresponden al titular de la cuenta.',
+    CH20: 'Formato de monto inválido (debe tener dos decimales).',
+    CUST: 'Operación cancelada por el titular en su aplicación bancaria.',
+    DS02: 'Operación cancelada en el sistema bancario.',
+    DU01: 'Identificador de transacción duplicado.',
+    ED05: 'Falla en la liquidación de fondos.',
+    MD01: 'No tienes afiliado el servicio de Débito Inmediato en tu banco.',
+    MD09: 'Servicio de Débito Inmediato inactivo en tu banco.',
+    MD15: 'Cobro no permitido por políticas de tu entidad bancaria.',
+    MD22: 'Afiliación de débito suspendida.',
+    RC08: 'Código de banco inválido.',
+    RJCT: 'El débito inmediato fue rechazado por el banco.',
+    TKCM: 'La clave dinámica (OTP) ingresada es incorrecta o expiró.',
+    TM01: 'Operación realizada fuera del horario permitido.',
+    VE01: 'Incidencia técnica en el procesador bancario. Intenta más tarde.'
+};
+
+function obtenerMensajeErrorR4(codigo, mensajeApi) {
+    const cod = String(codigo || '').toUpperCase().trim();
+    return MENSAJES_ISO_R4[cod] || mensajeApi || 'El débito inmediato fue rechazado por el banco.';
+}
 
 const validarCantidadEntera = (cantidad) => {
     const num = Number(cantidad);
@@ -371,8 +406,11 @@ async function consultarTasaExterna() {
 async function obtenerTasaBinanceAlta() {
     try {
         const registro = await Tasa.findOne({ nombre: "P2P" }).lean();
+        const esReciente =
+            registro?.ultimaActualizacion &&
+            (Date.now() - new Date(registro.ultimaActualizacion).getTime()) <= MAX_ANTIGUEDAD_TASA_MS;
 
-        if (registro && Number.isFinite(registro.valor) && registro.valor > 0) {
+        if (registro && Number.isFinite(registro.valor) && registro.valor > 0 && esReciente) {
             ultimaTasaAltaConocida = registro.valor;
             return registro.valor;
         }
@@ -390,6 +428,10 @@ async function obtenerTasaBinanceAlta() {
                 { upsert: true, new: true }
             );
             return tasaInicial;
+        }
+
+        if (registro && Number.isFinite(registro.valor) && registro.valor > 0) {
+            return registro.valor;
         }
     } catch (error) {
         console.warn("⚠️ Error leyendo tasa P2P de MongoDB, usando respaldo en memoria:", error.message);
@@ -473,29 +515,15 @@ GamesRouter.get("/1/:name", async (request, response) => {
 });
 
 async function desactivarProductoNoDisponible(ids) {
-    const filtroExternalId = {
-        $or: [
-            { external_id: ids.juegoIdLimpio },
-            { external_id: ids.juegoIdNum }
-        ]
-    };
-
-    const resultado = await Producto_Model.updateMany(
-        filtroExternalId,
+    await Producto_Model.updateMany(
+        {
+            $or: [
+                { external_id: ids.juegoIdLimpio },
+                { external_id: ids.juegoIdNum }
+            ]
+        },
         { $set: { is_available: false } }
     );
-
-    if (resultado.matchedCount === 0) {
-        await Producto_Model.updateMany(
-            {
-                $or: [
-                    { category_id: ids.juegoIdLimpio },
-                    { category_id: ids.juegoIdNum }
-                ]
-            },
-            { $set: { is_available: false } }
-        );
-    }
 }
 
 GamesRouter.post("/PlayerID", userExtractor, async (request, response) => {
@@ -526,7 +554,9 @@ GamesRouter.post("/PlayerID", userExtractor, async (request, response) => {
             const errorCode = data?.error?.code;
 
             if (errorCode === 'PRODUCT_UNAVAILABLE') {
-                await desactivarProductoNoDisponible(ids);
+                await desactivarProductoNoDisponible(ids).catch((dbErr) => {
+                    console.error("❌ Error desactivando producto en BD:", dbErr.message);
+                });
                 return response.status(503).json({
                     success: false,
                     code: 'PRODUCT_UNAVAILABLE',
@@ -636,19 +666,44 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
         const cantidadEntera = Number(Cantidad);
 
         // 1. Validar jugador con Shop2TopUp
-        const { data: validacionData } = await httpClient.post(
-            "https://shop2topup.com/api/endpoints/v1/player/validate",
-            {
-                sub_category_id: ids.juegoIdNum,
-                player_id: ids.playerIdPayload
-            },
-            {
-                headers: {
-                    "Authorization": `Bearer ${process.env.SHOP2TOPUP_API_KEY}`,
-                    "Content-Type": "application/json"
+        let validacionData;
+        try {
+            const respVal = await httpClient.post(
+                "https://shop2topup.com/api/endpoints/v1/player/validate",
+                {
+                    sub_category_id: ids.juegoIdNum,
+                    player_id: ids.playerIdPayload
+                },
+                {
+                    headers: {
+                        "Authorization": `Bearer ${process.env.SHOP2TOPUP_API_KEY}`,
+                        "Content-Type": "application/json"
+                    }
                 }
+            );
+            validacionData = respVal.data;
+        } catch (valErr) {
+            if (valErr.response?.data?.error?.code === 'PRODUCT_UNAVAILABLE') {
+                await desactivarProductoNoDisponible(ids).catch(() => {});
+                return response.status(503).json({
+                    success: false,
+                    code: 'PRODUCT_UNAVAILABLE',
+                    error: 'Este producto no está disponible temporalmente.',
+                    redirect: '/'
+                });
             }
-        );
+            throw valErr;
+        }
+
+        if (validacionData?.error?.code === 'PRODUCT_UNAVAILABLE') {
+            await desactivarProductoNoDisponible(ids).catch(() => {});
+            return response.status(503).json({
+                success: false,
+                code: 'PRODUCT_UNAVAILABLE',
+                error: 'Este producto no está disponible temporalmente.',
+                redirect: '/'
+            });
+        }
 
         if (!validacionData || !validacionData.success) {
             return response.status(404).json({ error: 'Jugador no válido o ID incorrecto en el juego.' });
@@ -662,10 +717,17 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
             return response.status(400).json({ error: 'Método de pago no válido' });
         }
 
-        // 2. Buscar producto y calcular el mismo precio al público que muestra el catálogo
-        const Producto = await Producto_Model.findOne({ external_id: ids.juegoIdLimpio }).lean();
+        // 2. Buscar producto disponible y calcular precio al público
+        const Producto = await Producto_Model.findOne({
+            $or: [
+                { external_id: ids.juegoIdLimpio },
+                { external_id: ids.juegoIdNum }
+            ],
+            is_available: true
+        }).lean();
+
         if (!Producto) {
-            return response.status(404).json({ error: 'Producto no encontrado en el catálogo.' });
+            return response.status(404).json({ error: 'Producto no disponible en el catálogo.' });
         }
 
         const tasaRef = Number(await obtenerTasaBinanceAlta()) || TASA_RESPALDO_DEFAULT;
@@ -707,6 +769,29 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
         saldoDescontado = costoTotal;
         const orderId = crypto.randomUUID();
 
+        // 3.5 Registrar la orden en BD ANTES de llamar a Shop2TopUp
+        const txBilletera = await Trasferencia_Model.create({
+            telefono: user.telefono || 'N/A',
+            telefonoEmisor: user.telefono || 'N/A',
+            cedula: user.cedula || 'N/A',
+            bancoEmisor: 'Billetera Interna',
+            Producto: Producto.name,
+            juegoId: ids.juegoIdNum,
+            playerId: ids.playerIdLimpio,
+            Cantidad: cantidadEntera,
+            precioUnitarioUsd: precioProveedorUsd,
+            monto: costoTotal,
+            concepto: `Compra de ${cantidadEntera}x ${Producto.name || 'Diamantes/Ítem'} para ID: ${ids.playerIdLimpio}`,
+            referencia: orderId,
+            responsable: user._id,
+            uuid: orderId,
+            proveedorRequestId: orderId,
+            ordenProcesada: false,
+            utilizado: true,
+            estatus: 'ENVIANDO_PROVEEDOR',
+            tipoTransaccion: 'Billetera'
+        });
+
         // 4. Crear el pedido en Shop2TopUp
         let orderData;
         try {
@@ -735,6 +820,15 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
                 statusHttp && statusHttp >= 400 && statusHttp < 500 && statusHttp !== 408 && statusHttp !== 429;
 
             if (esRechazoDefinitivo) {
+                await Trasferencia_Model.updateOne(
+                    { _id: txBilletera._id },
+                    {
+                        $set: {
+                            estatus: 'REEMBOLSADO',
+                            detalleError: `Proveedor rechazó la recarga (HTTP ${statusHttp}). Saldo devuelto.`
+                        }
+                    }
+                );
                 await acreditarSaldoBilletera(
                     user._id,
                     saldoDescontado,
@@ -746,30 +840,17 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
                 });
             }
 
-            // Timeout o error 5xx: no duplicar reembolso automático hasta verificar con proveedor
+            // Timeout o error 5xx: marcar para revisión manual antes de reembolsar
             saldoDescontado = 0;
-            await Trasferencia_Model.create({
-                telefono: user.telefono || 'N/A',
-                telefonoEmisor: user.telefono || 'N/A',
-                cedula: user.cedula || 'N/A',
-                bancoEmisor: 'Billetera Interna',
-                Producto: Producto.name,
-                juegoId: ids.juegoIdNum,
-                playerId: ids.playerIdLimpio,
-                Cantidad: cantidadEntera,
-                precioUnitarioUsd: precioProveedorUsd,
-                monto: costoTotal,
-                concepto: `Compra de ${cantidadEntera}x ${Producto.name || 'Diamantes/Ítem'} para ID: ${ids.playerIdLimpio}`,
-                referencia: orderId,
-                responsable: user._id,
-                uuid: orderId,
-                proveedorRequestId: orderId,
-                ordenProcesada: false,
-                utilizado: true,
-                estatus: 'REVISION_MANUAL',
-                detalleError: `Error ambiguo con proveedor en /Compra: ${provError.message}`,
-                tipoTransaccion: 'Billetera'
-            });
+            await Trasferencia_Model.updateOne(
+                { _id: txBilletera._id },
+                {
+                    $set: {
+                        estatus: 'REVISION_MANUAL',
+                        detalleError: `Error ambiguo con proveedor en /Compra: ${provError.message}`
+                    }
+                }
+            );
 
             return response.status(202).json({
                 success: true,
@@ -778,38 +859,35 @@ GamesRouter.post("/Compra", userExtractor, async (request, response) => {
         }
 
         if (!orderData || !orderData.success) {
+            await Trasferencia_Model.updateOne(
+                { _id: txBilletera._id },
+                {
+                    $set: {
+                        estatus: 'REEMBOLSADO',
+                        detalleError: 'Rechazo inmediato en /Compra. Saldo devuelto.'
+                    }
+                }
+            );
             await acreditarSaldoBilletera(user._id, saldoDescontado, 'Reversión por rechazo inmediato en /Compra');
             saldoDescontado = 0;
             return response.status(500).json({ error: 'Error al procesar el pedido con el proveedor', detalle: orderData });
         }
 
         saldoDescontado = 0;
-
         const estadoProveedor = orderData.order?.status || 'pending';
         const proveedorOrderId = String(orderData.order?.order_id || orderId).trim();
 
-        await Trasferencia_Model.create({
-            telefono: user.telefono || 'N/A',
-            telefonoEmisor: user.telefono || 'N/A',
-            cedula: user.cedula || 'N/A',
-            bancoEmisor: 'Billetera Interna',
-            Producto: Producto.name,
-            juegoId: ids.juegoIdNum,
-            playerId: ids.playerIdLimpio,
-            Cantidad: cantidadEntera,
-            precioUnitarioUsd: precioProveedorUsd,
-            monto: costoTotal,
-            concepto: `Compra de ${cantidadEntera}x ${Producto.name || 'Diamantes/Ítem'} para ID: ${ids.playerIdLimpio}`,
-            referencia: proveedorOrderId,
-            responsable: user._id,
-            uuid: orderId,
-            proveedorRequestId: orderId,
-            proveedorOrderId: proveedorOrderId,
-            ordenProcesada: true,
-            utilizado: true,
-            estatus: estadoProveedor === 'completed' ? 'APROBADO' : 'PENDIENTE',
-            tipoTransaccion: 'Billetera'
-        });
+        await Trasferencia_Model.updateOne(
+            { _id: txBilletera._id },
+            {
+                $set: {
+                    referencia: proveedorOrderId,
+                    proveedorOrderId: proveedorOrderId,
+                    ordenProcesada: true,
+                    estatus: estadoProveedor === 'completed' ? 'APROBADO' : 'PENDIENTE'
+                }
+            }
+        );
 
         return response.json({
             success: true,
@@ -1291,19 +1369,44 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             player_id: ids.playerIdPayload
         });
 
-        const { data: validacionData } = await httpClient.post(
-            'https://shop2topup.com/api/endpoints/v1/player/validate',
-            {
-                sub_category_id: ids.juegoIdNum,
-                player_id: ids.playerIdPayload
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${process.env.SHOP2TOPUP_API_KEY}`,
-                    'Content-Type': 'application/json'
+        let validacionData;
+        try {
+            const respVal = await httpClient.post(
+                'https://shop2topup.com/api/endpoints/v1/player/validate',
+                {
+                    sub_category_id: ids.juegoIdNum,
+                    player_id: ids.playerIdPayload
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.SHOP2TOPUP_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
                 }
+            );
+            validacionData = respVal.data;
+        } catch (valErr) {
+            if (valErr.response?.data?.error?.code === 'PRODUCT_UNAVAILABLE') {
+                await desactivarProductoNoDisponible(ids).catch(() => {});
+                return response.status(503).json({
+                    success: false,
+                    code: 'PRODUCT_UNAVAILABLE',
+                    error: 'Este producto no está disponible temporalmente.',
+                    redirect: '/'
+                });
             }
-        );
+            throw valErr;
+        }
+
+        if (validacionData?.error?.code === 'PRODUCT_UNAVAILABLE') {
+            await desactivarProductoNoDisponible(ids).catch(() => {});
+            return response.status(503).json({
+                success: false,
+                code: 'PRODUCT_UNAVAILABLE',
+                error: 'Este producto no está disponible temporalmente.',
+                redirect: '/'
+            });
+        }
 
         if (!validacionData?.success) {
             return response.status(404).json({
@@ -1312,8 +1415,15 @@ GamesRouter.post('/solicitar-otp', userExtractor, async (request, response) => {
             });
         }
 
-        // 2. Buscar producto y calcular monto exacto usando la misma fórmula del catálogo
-        const Producto = await Producto_Model.findOne({ external_id: ids.juegoIdLimpio }).lean();
+        // 2. Buscar producto disponible y calcular monto exacto usando la misma fórmula del catálogo
+        const Producto = await Producto_Model.findOne({
+            $or: [
+                { external_id: ids.juegoIdLimpio },
+                { external_id: ids.juegoIdNum }
+            ],
+            is_available: true
+        }).lean();
+
         if (!Producto) {
             return response.status(404).json({ success: false, error: 'Producto no disponible en el catálogo.' });
         }
@@ -1553,14 +1663,15 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
         }
 
         // CASO 3: RECHAZO BANCARIO DEFINITIVO
+        const mensajeLegible = obtenerMensajeErrorR4(codigoR4, mensaje || message);
         transaccion.estatus = 'RECHAZADO';
         transaccion.codigoErrorR4 = codigoR4 || 'RJCT';
-        transaccion.detalleError = mensaje || message || 'Rechazado por el banco.';
+        transaccion.detalleError = mensajeLegible;
         await transaccion.save();
 
         return response.status(400).json({
             success: false,
-            error: mensaje || message || 'El débito inmediato fue rechazado por el banco.',
+            error: mensajeLegible,
             codigoRespuesta: codigoR4
         });
     } catch (error) {
@@ -1574,7 +1685,7 @@ GamesRouter.post('/confirmar-c2p', userExtractor, async (request, response) => {
 
             if (esRechazoExplicitoR4) {
                 const codigoErr = String(dataError?.code || `HTTP_${statusHttp}`).toUpperCase().trim();
-                const mensajeErr = dataError?.mensaje || dataError?.message || 'Débito rechazado por R4.';
+                const mensajeErr = obtenerMensajeErrorR4(codigoErr, dataError?.mensaje || dataError?.message);
 
                 transaccion.estatus = 'RECHAZADO';
                 transaccion.codigoErrorR4 = codigoErr;
@@ -1663,7 +1774,7 @@ GamesRouter.post('/SIMF', async (request, response) => {
                     $set: {
                         estatus: 'RECHAZADO',
                         codigoErrorR4: codigoNorm,
-                        detalleError: message || 'Rechazado vía SIMF'
+                        detalleError: obtenerMensajeErrorR4(codigoNorm, message)
                     }
                 }
             );
@@ -1683,26 +1794,20 @@ async function consultarEstatusOperacionR4(r4Uuid) {
     verificarCredenciales();
     const uuidLimpio = String(r4Uuid).trim();
     const tokenAuthorization = generarFirmaR4(uuidLimpio);
-    const headers = {
-        'Content-Type': 'application/json',
-        Authorization: tokenAuthorization,
-        Commerce: R4_COMMERCE
-    };
 
-    const payloads = [{ uuid: uuidLimpio }, { Id: uuidLimpio }, { id: uuidLimpio }];
-    let ultimoError = null;
-
-    for (const bodyPayload of payloads) {
-        try {
-            const { data } = await r4HttpClient.post(`${R4_BASE_URL}/ConsultarOperaciones`, bodyPayload, { headers });
-            return data;
-        } catch (err) {
-            ultimoError = err;
-            if (err.response?.status !== 400) break;
+    const { data } = await r4HttpClient.post(
+        `${R4_BASE_URL}/ConsultarOperaciones`,
+        { uuid: uuidLimpio },
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: tokenAuthorization,
+                Commerce: R4_COMMERCE
+            }
         }
-    }
+    );
 
-    throw ultimoError;
+    return data;
 }
 
 async function verificarYProcesarOperacionR4(uuid, userIdPropietario = null) {
@@ -1765,7 +1870,7 @@ async function verificarYProcesarOperacionR4(uuid, userIdPropietario = null) {
                 $set: {
                     estatus: 'RECHAZADO',
                     codigoErrorR4: codigoR4,
-                    detalleError: resultadoR4?.mensaje || resultadoR4?.message || 'Rechazado en consulta R4'
+                    detalleError: obtenerMensajeErrorR4(codigoR4, resultadoR4?.mensaje || resultadoR4?.message)
                 }
             }
         );
@@ -1978,11 +2083,23 @@ const iniciarVigilanteOrdenesProveedor = () => {
                     );
 
                     if (txReembolsada) {
-                        await acreditarSaldoBilletera(
-                            txReembolsada.responsable,
-                            redondear2(txReembolsada.monto),
-                            `Orden proveedor ${orderId} (${estadoProveedor})`
-                        );
+                        try {
+                            await acreditarSaldoBilletera(
+                                txReembolsada.responsable,
+                                redondear2(txReembolsada.monto),
+                                `Orden proveedor ${orderId} (${estadoProveedor})`
+                            );
+                        } catch (walletErr) {
+                            await Trasferencia_Model.updateOne(
+                                { _id: txReembolsada._id },
+                                {
+                                    $set: {
+                                        estatus: 'REVISION_MANUAL',
+                                        detalleError: `Fallo al reembolsar $${txReembolsada.monto} USD: ${walletErr.message}`
+                                    }
+                                }
+                            );
+                        }
                     }
                 }
                 // C. Entrega parcial -> Reembolso proporcional del monto pagado por el cliente
@@ -2018,11 +2135,23 @@ const iniciarVigilanteOrdenesProveedor = () => {
                         );
 
                         if (txParcial && montoReembolsoUsd > 0) {
-                            await acreditarSaldoBilletera(
-                                txParcial.responsable,
-                                montoReembolsoUsd,
-                                `Reembolso parcial orden ${orderId}`
-                            );
+                            try {
+                                await acreditarSaldoBilletera(
+                                    txParcial.responsable,
+                                    montoReembolsoUsd,
+                                    `Reembolso parcial orden ${orderId}`
+                                );
+                            } catch (walletErr) {
+                                await Trasferencia_Model.updateOne(
+                                    { _id: txParcial._id },
+                                    {
+                                        $set: {
+                                            estatus: 'REVISION_MANUAL',
+                                            detalleError: `Fallo al acreditar reembolso parcial ($${montoReembolsoUsd.toFixed(2)} USD): ${walletErr.message}`
+                                        }
+                                    }
+                                );
+                            }
                         }
                     } catch (partialErr) {
                         console.error(`❌ Error detalle parcial orden ${orderId}:`, partialErr.message);
