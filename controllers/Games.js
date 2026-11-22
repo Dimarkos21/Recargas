@@ -1797,7 +1797,7 @@ async function consultarEstatusOperacionR4(r4Uuid) {
 
     const { data } = await r4HttpClient.post(
         `${R4_BASE_URL}/ConsultarOperaciones`,
-        { uuid: uuidLimpio },
+        { Id: uuidLimpio },
         {
             headers: {
                 'Content-Type': 'application/json',
