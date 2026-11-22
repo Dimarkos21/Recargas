@@ -63,7 +63,7 @@ if (botoncerrar && MenuIniciarSesion) {
 if (btnGoogle) {
     btnGoogle.addEventListener("click", (e) => {
         e.preventDefault();
-        window.location.href = "http://localhost:3006/auth/google";
+        window.location.href = "https://www.scorpiongaming.com.ve/auth/google";
     });
 }
 
