@@ -109,7 +109,7 @@ app.get('/auth/google',
     passport.authenticate('google', { scope: ['profile', 'email'] })
 );
 
-app.get('/auth/google/callback', 
+app.get('https://www.scorpiongaming.com.ve/auth/google/callback', 
     passport.authenticate('google', { failureRedirect: '/login' }),
     function(req, res) {
         // Autenticación exitosa, redirige a la tienda o panel
