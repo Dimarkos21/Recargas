@@ -1,5 +1,5 @@
 /* ==========================================
-   1. VARIABLES Y TEMA GENERAL (DARK GAMER)
+1. VARIABLES Y TEMA GENERAL (DARK GAMER)
    ========================================== */
 :root {
   --bg-primary: #0b0e14;       /* Fondo principal oscuro */
@@ -20,6 +20,11 @@
   padding: 0;
 }
 
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   background-color: var(--bg-primary);
   color: var(--text-main);
@@ -28,8 +33,13 @@ body {
   min-height: 100vh;
 }
 
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ==========================================
-   2. NAVEGACIÓN PRINCIPAL & BRANDING
+2. NAVEGACIÓN PRINCIPAL & BRANDING
    ========================================== */
 #barra {
   display: flex;
@@ -41,6 +51,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  gap: 0.75rem;
 }
 
 #brand-logo {
@@ -59,6 +70,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-neon);
+  white-space: nowrap;
 }
 
 #boton:hover {
@@ -87,6 +99,7 @@ body {
   display: flex;
   list-style: none;
   gap: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
@@ -117,6 +130,7 @@ body {
   color: var(--text-main);
   padding: 0.5rem;
   width: 250px;
+  min-width: 0;
 }
 
 .btn-search {
@@ -127,7 +141,7 @@ body {
 }
 
 /* ==========================================
-   3. CONTENEDOR PRINCIPAL & HERO HEADER
+3. CONTENEDOR PRINCIPAL & HERO HEADER
    ========================================== */
 .main-container {
   max-width: 1200px;
@@ -149,11 +163,13 @@ body {
   border: 1px solid var(--border-color);
   padding: 0.4rem 1.2rem;
   border-radius: 50px;
+  max-width: 100%;
 }
 
 .inv-pulse-dot {
   width: 8px;
   height: 8px;
+  flex-shrink: 0;
   background-color: var(--border-color);
   border-radius: 50%;
   box-shadow: 0 0 10px var(--border-color);
@@ -180,6 +196,7 @@ header {
   background: linear-gradient(45deg, #ffffff, var(--accent-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  overflow-wrap: break-word;
 }
 
 .tagline {
@@ -195,11 +212,11 @@ h2 {
 }
 
 /* ==========================================
-   4. TARJETAS DE SERVICIO (SECCIÓN INTRO)
+4. TARJETAS DE SERVICIO (SECCIÓN INTRO)
    ========================================== */
 .intro {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 2rem;
 }
 
@@ -208,6 +225,7 @@ h2 {
   border: 1px solid #21262d;
   border-radius: 12px;
   padding: 1.5rem;
+  min-width: 0;
   transition: transform 0.3s ease, border-color 0.3s ease;
 }
 
@@ -237,19 +255,21 @@ h2 {
   font-size: 1.3rem;
   margin-bottom: 0.5rem;
   color: var(--accent-color);
+  overflow-wrap: break-word;
 }
 
 .description p {
   color: var(--text-muted);
   font-size: 0.95rem;
+  overflow-wrap: break-word;
 }
 
 /* ==========================================
-   5. FOOTER & WIDGETS FLOTANTES
+5. FOOTER & WIDGETS FLOTANTES
    ========================================== */
 footer {
   text-align: center;
-  padding: 2rem 0;
+  padding: 2rem 1rem;
   margin-top: 3rem;
   border-top: 1px solid #21262d;
   color: var(--text-muted);
@@ -287,28 +307,12 @@ footer {
   bottom: 25px;
   left: 25px;
   z-index: 1000;
+  max-width: calc(100vw - 110px);
 }
 
 /* ==========================================
-   6. RESPONSIVE DESIGN
+6. ESTILOS DE TIENDA Y PAQUETES
    ========================================== */
-@media (max-width: 768px) {
-  header {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
-
-  .nav-container {
-    flex-direction: column;
-  }
-
-  .nav-search input {
-    width: 100%;
-  }
-}
-
-
-/* Estilos generales del contenedor */
 .store-main-container {
     display: flex;
     gap: 24px;
@@ -319,11 +323,13 @@ footer {
     background-color: #0b0f19;
     padding: 20px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 /* SECCIÓN IZQUIERDA */
 .packages-section {
     flex: 2;
+    min-width: 0;
     background: #121826;
     border: 1px solid #1f293d;
     border-radius: 16px;
@@ -334,6 +340,8 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 20px;
 }
 
@@ -349,6 +357,7 @@ footer {
     font-weight: bold;
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -360,6 +369,7 @@ footer {
     font-size: 18px;
     margin: 0;
     font-weight: 600;
+    text-align: left;
 }
 
 .toggle-options {
@@ -368,6 +378,7 @@ footer {
     border-radius: 8px;
     display: flex;
     gap: 4px;
+    max-width: 100%;
 }
 
 .toggle-btn {
@@ -391,7 +402,7 @@ footer {
 /* Grid de paquetes */
 .packages-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
 }
 
@@ -405,7 +416,8 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 90px;
+    min-height: 90px;
+    min-width: 0;
 }
 
 .package-card:hover {
@@ -420,6 +432,7 @@ footer {
 .package-info {
     font-size: 16px;
     font-weight: bold;
+    overflow-wrap: break-word;
 }
 
 .package-info small {
@@ -441,6 +454,7 @@ footer {
 /* SECCIÓN DERECHA: Resumen del Pedido */
 .order-summary {
     flex: 1;
+    min-width: 0;
     background: #121826;
     border: 1px solid #1f293d;
     border-radius: 16px;
@@ -462,6 +476,7 @@ footer {
     background: #1a2234;
     padding: 8px;
     border-radius: 8px;
+    flex-shrink: 0;
 }
 
 .summary-title-group h3 {
@@ -480,6 +495,7 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     background: #182030;
     padding: 12px 16px;
     border-radius: 10px;
@@ -495,6 +511,7 @@ footer {
     padding: 4px 10px;
     border-radius: 6px;
     border: 1px solid #222e44;
+    flex-shrink: 0;
 }
 
 .quantity-control button {
@@ -565,36 +582,28 @@ footer {
     background: #c80000;
 }
 
-/* Diseño responsivo para pantallas pequeñas */
-@media (max-width: 900px) {
-    .store-main-container {
-        flex-direction: column;
-    }
-    .packages-grid {
-        grid-template-columns: repeat(2, 1fr);
- 
- 
-      }
-}
-/* Fondo oscuro translúcido que cubre la pantalla cuando se abre el modal */
+/* ==========================================
+7. MODAL DE AUTENTICACIÓN
+   ========================================== */
 #authModalOverlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    padding: 16px;
     background-color: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(4px); /* Efecto difuminado moderno */
+    backdrop-filter: blur(4px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999; /* Asegura que flote por encima de todo */
+    z-index: 9999;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-y: auto;
 }
 
-/* Tarjeta principal del modal */
 #authModalOverlay .auth-modal-card {
-    background-color: #111622; /* Tono oscuro idéntico al de tu tienda */
+    background-color: #111622;
     border: 1px solid #1e2638;
     border-radius: 16px;
     width: 100%;
@@ -604,9 +613,9 @@ footer {
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
     color: #ffffff;
     box-sizing: border-box;
+    margin: auto;
 }
 
-/* Botón de cierre (X) */
 #authModalOverlay .auth-close-btn {
     background: none;
     border: none;
@@ -623,16 +632,17 @@ footer {
     color: #ffffff;
 }
 
-/* Cabecera del modal */
 #authModalOverlay .auth-header {
     margin-bottom: 24px;
+    padding-right: 24px;
 }
 
 #authModalOverlay .auth-header h2 {
     font-size: 20px;
     font-weight: 700;
     color: #ffffff;
-    margin-bottom: 4px;
+    margin: 0 0 4px 0;
+    text-align: left;
 }
 
 #authModalOverlay .auth-header p {
@@ -640,7 +650,6 @@ footer {
     color: #94a3b8;
 }
 
-/* Contenedor de botones de autenticación */
 #authModalOverlay .auth-actions {
     display: flex;
     flex-direction: column;
@@ -670,7 +679,6 @@ footer {
     border-color: #3b4d6c;
 }
 
-/* Texto de registro inferior */
 #authModalOverlay .auth-signup-text {
     text-align: center;
     font-size: 13px;
@@ -679,7 +687,7 @@ footer {
 }
 
 #authModalOverlay .auth-signup-text a {
-    color: #10b981; /* Verde brillante característico */
+    color: #10b981;
     text-decoration: none;
     font-weight: 600;
 }
@@ -688,14 +696,12 @@ footer {
     text-decoration: underline;
 }
 
-/* Línea divisoria */
 #authModalOverlay .auth-divider {
     border: none;
     border-top: 1px solid #1e2638;
     margin-bottom: 20px;
 }
 
-/* Enlace de soporte */
 #authModalOverlay .auth-support {
     display: flex;
     align-items: center;
@@ -711,10 +717,9 @@ footer {
     color: #ffffff;
 }
 
-
-
-
-
+/* ==========================================
+8. MENÚ DE PERFIL SCORPION
+   ========================================== */
 .scorpion-nav-menu {
     position: relative;
     display: inline-block;
@@ -741,6 +746,7 @@ footer {
 .scorpion-user-avatar {
     width: 26px;
     height: 26px;
+    flex-shrink: 0;
     background: linear-gradient(135deg, #ff2a5f, #ff758c);
     border-radius: 50%;
     display: flex;
@@ -765,12 +771,12 @@ footer {
     transition: transform 0.2s ease;
 }
 
-/* Menú Desplegable */
 .scorpion-flyout-menu {
     position: absolute;
     right: 0;
     top: calc(100% + 8px);
     width: 230px;
+    max-width: calc(100vw - 24px);
     background: #13151f;
     border: 1px solid #23283b;
     border-radius: 10px;
@@ -783,13 +789,15 @@ footer {
     overflow: hidden;
 }
 
-.scorpion-nav-menu:hover .scorpion-flyout-menu {
+.scorpion-nav-menu:hover .scorpion-flyout-menu,
+.scorpion-nav-menu:focus-within .scorpion-flyout-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
 }
 
-.scorpion-nav-menu:hover .scorpion-caret {
+.scorpion-nav-menu:hover .scorpion-caret,
+.scorpion-nav-menu:focus-within .scorpion-caret {
     transform: rotate(180deg);
 }
 
@@ -870,24 +878,26 @@ footer {
     color: #ff6b6b;
 }
 
-
-.oculto{
-  display: none;
+.oculto {
+  display: none !important;
 }
 
 a {
     text-decoration: none;
 }
 
-
-
+/* ==========================================
+9. INPUTS, TOASTS Y MÉTODOS DE PAGO
+   ========================================== */
 .input-group {
   background-color: #0b0f19;
   padding: 16px;
   border-radius: 12px;
+  width: 100%;
   max-width: 400px;
   font-family: system-ui, -apple-system, sans-serif;
 }
+
 .input-label {
   display: block;
   font-size: 11px;
@@ -897,11 +907,13 @@ a {
   text-transform: uppercase;
   margin-bottom: 8px;
 }
+
 .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
+
 .input-badge {
   position: absolute;
   left: 12px;
@@ -914,6 +926,7 @@ a {
   border-radius: 6px;
   letter-spacing: 0.05em;
 }
+
 .custom-input {
   width: 100%;
   padding: 14px 16px 14px 54px;
@@ -925,14 +938,17 @@ a {
   outline: none;
   transition: all 0.2s ease;
 }
+
 .custom-input::placeholder {
   color: #64748b;
 }
+
 .custom-input:focus {
   background-color: #151c2d;
   border-color: rgba(52, 211, 153, 0.5);
   box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
 }
+
 /* Contenedor en la esquina inferior derecha */
 .toast-container {
   position: fixed;
@@ -942,12 +958,14 @@ a {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  max-width: calc(100vw - 32px);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Estilo base del Toast (Fondo oscuro estilo interfaz de juego) */
+/* Estilo base del Toast */
 .toast {
-  min-width: 280px;
+  min-width: 0;
+  width: 100%;
   max-width: 380px;
   padding: 16px 20px;
   border-radius: 10px;
@@ -966,28 +984,27 @@ a {
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Animación de entrada */
 .toast.show {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Variantes de color temáticas */
 .toast.success {
-  border-left: 4px solid #10b981; /* Verde éxito */
+  border-left: 4px solid #10b981;
   box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
 }
 
 .toast.error {
-  border-left: 4px solid #ff0707; /* Rojo neón idéntico a tu marca */
+  border-left: 4px solid #ff0707;
   box-shadow: 0 8px 24px rgba(255, 7, 7, 0.2);
 }
 
 .toast.info {
-  border-left: 4px solid #3b82f6; /* Azul info */
+  border-left: 4px solid #3b82f6;
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
 }
-/* Contenedor principal */
+
+/* Contenedor principal de pagos */
 .payment-container {
   display: flex;
   flex-direction: column;
@@ -998,7 +1015,6 @@ a {
   color: #ffffff;
 }
 
-/* Tarjeta base del método de pago */
 .payment-card {
   background: #121216;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1007,9 +1023,11 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   cursor: pointer;
   transition: all 0.25s ease;
   position: relative;
+  min-width: 0;
 }
 
 .payment-card:hover {
@@ -1017,7 +1035,6 @@ a {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Ocultar los inputs nativos de radio y checkbox */
 .payment-card input[type="radio"],
 .payment-card input[type="checkbox"] {
   position: absolute;
@@ -1025,25 +1042,24 @@ a {
   cursor: pointer;
 }
 
-/* Estilo para la tarjeta seleccionada (Borde verde neón idéntico al de tu imagen) */
 .payment-card.active,
 .payment-card:has(input:checked) {
   border-color: #10b981;
   box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
 }
 
-/* Contenido interno */
 .payment-content, .payment-info {
   display: flex;
   align-items: center;
   gap: 16px;
   width: 100%;
+  min-width: 0;
 }
 
-/* Ícono cuadrado oscuro */
 .payment-icon {
   width: 42px;
   height: 42px;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
   display: flex;
@@ -1056,38 +1072,32 @@ a {
   display: flex;
   flex-direction: column;
   gap: 3px;
+  min-width: 0;
 }
 
 .payment-title {
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.3px;
+  overflow-wrap: break-word;
 }
 
 .payment-desc {
   font-size: 13px;
   color: #9ca3af;
+  overflow-wrap: break-word;
 }
 
 .text-error {
-  color: #ef4444; /* Rojo para saldo insuficiente */
+  color: #ef4444;
 }
 
-/* Cuadrícula de 2 columnas para los métodos de pago */
 .payment-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-/* Responsive para pantallas pequeñas */
-@media (max-width: 600px) {
-  .payment-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Estilo del interruptor (Toggle Switch) superior */
 .balance-card .toggle-switch {
   position: relative;
   width: 46px;
@@ -1111,18 +1121,16 @@ a {
 }
 
 .balance-card input:checked ~ .toggle-switch {
-  background: #10b981; /* Verde neón al activarse */
+  background: #10b981;
 }
 
 .balance-card input:checked ~ .toggle-switch::after {
- 
- 
   transform: translateX(22px);
 }
 
-
-/* --- WIDGET PAGO C2P - SCORPION GAMING THEME --- */
-
+/* ==========================================
+10. WIDGET PAGO C2P - SCORPION GAMING THEME
+   ========================================== */
 :root {
     --r4-bg-overlay: rgba(5, 7, 10, 0.85);
     --r4-card-bg: #121622;
@@ -1136,23 +1144,23 @@ a {
     --r4-input-focus: #ff1e38;
 }
 
-/* Fondo Modal con desenfoque */
 .modal-overlayR4 {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    padding: 16px;
     background-color: var(--r4-bg-overlay);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    overflow-y: auto;
     animation: r4FadeIn 0.25s ease-in-out;
 }
 
-/* Tarjeta Principal */
 .r4-card {
     background-color: var(--r4-card-bg);
     border: 1px solid var(--r4-card-border);
@@ -1164,9 +1172,9 @@ a {
     position: relative;
     color: var(--r4-text-main);
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    margin: auto;
 }
 
-/* Cabecera */
 .r4-header h3 {
     margin: 0 0 6px 0;
     font-size: 1.15rem;
@@ -1174,6 +1182,7 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 8px;
     color: var(--r4-text-main);
     letter-spacing: 0.3px;
 }
@@ -1184,7 +1193,6 @@ a {
     color: var(--r4-text-muted);
 }
 
-/* Botón Cerrar */
 #cerrarR4 {
     background: transparent;
     border: none;
@@ -1194,6 +1202,7 @@ a {
     cursor: pointer;
     width: 30px;
     height: 30px;
+    flex-shrink: 0;
     border-radius: 6px;
     display: flex;
     align-items: center;
@@ -1206,7 +1215,6 @@ a {
     color: var(--r4-primary);
 }
 
-/* Caja de Datos / Resumen */
 .r4-datos-box {
     background-color: var(--r4-input-bg);
     border: 1px solid var(--r4-card-border);
@@ -1216,6 +1224,8 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .r4-datos-box p {
@@ -1238,7 +1248,6 @@ a {
     font-weight: 800;
 }
 
-/* Grupos de Formulario */
 .r4-group {
     margin-bottom: 14px;
 }
@@ -1289,7 +1298,6 @@ a {
     color: var(--r4-text-muted);
 }
 
-/* Botón de Acción Principal (Estilo idéntico a COMPRAR) */
 .r4-btn {
     width: 100%;
     background-color: var(--r4-primary);
@@ -1316,7 +1324,6 @@ a {
     transform: translateY(1px);
 }
 
-/* Animación de Entrada */
 @keyframes r4FadeIn {
     from {
         opacity: 0;
@@ -1325,5 +1332,174 @@ a {
     to {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+/* ==========================================
+11. RESPONSIVE DESIGN (SIN DESBORDAMIENTOS)
+   ========================================== */
+@media (max-width: 900px) {
+    .store-main-container {
+        flex-direction: column;
+        margin: 20px auto;
+        padding: 14px;
+    }
+
+    .packages-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    #barra {
+        padding: 0.8rem 1rem;
+    }
+
+    #brand-logo {
+        font-size: 1.05rem;
+    }
+
+    #boton {
+        padding: 0.5rem 0.95rem;
+        font-size: 0.85rem;
+    }
+
+    .articulos-nav {
+        padding: 0.8rem 1rem;
+    }
+
+    .nav-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-links {
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .nav-search {
+        width: 100%;
+    }
+
+    .nav-search input {
+        width: 100%;
+    }
+
+    .main-container {
+        margin: 1.25rem auto;
+        padding: 0 1rem;
+    }
+
+    header {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .header-text h1 {
+        font-size: 1.85rem;
+    }
+
+    .tagline {
+        font-size: 1rem;
+    }
+
+    h2 {
+        font-size: 1.45rem;
+        margin: 1.8rem 0 1.2rem;
+    }
+
+    .intro {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .description {
+        padding: 1.15rem;
+    }
+
+    .packages-section,
+    .order-summary {
+        padding: 16px;
+    }
+
+    .toggle-options {
+        width: 100%;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    .payment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-card {
+        padding: 14px;
+    }
+
+    .payment-content, .payment-info {
+        gap: 12px;
+    }
+
+    .toast-container {
+        right: 16px;
+        left: 16px;
+        bottom: 16px;
+    }
+
+    .toast {
+        max-width: 100%;
+    }
+
+    #authModalOverlay .auth-modal-card,
+    .r4-card {
+        padding: 20px 16px;
+    }
+
+    .whatsapp-float {
+        width: 48px;
+        height: 48px;
+        bottom: 16px;
+        right: 16px;
+    }
+
+    .whatsapp-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    #google_translate_element {
+        bottom: 16px;
+        left: 16px;
+    }
+}
+
+@media (max-width: 400px) {
+    .scorpion-user-pseudo {
+        display: none;
+    }
+
+    .packages-grid {
+        gap: 10px;
+    }
+
+    .package-card {
+        padding: 12px;
+    }
+
+    .r4-datos-box {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .r4-monto {
+        text-align: left;
     }
 }

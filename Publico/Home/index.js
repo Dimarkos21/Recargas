@@ -65,7 +65,15 @@ nav_menu.classList.remove("oculto");
 const response = await axios.get('/api/Game');
 
     console.log('Productos obtenidos:',response);
+function cortarPalabras(texto, limite = 5) {
+  const palabras = texto.trim().split(/\s+/);
+  if (palabras.length <= limite) return texto;
+  return palabras.slice(0, limite).join(' ') + '...';
+}
 
+// Ejemplo con tus paquetes:
+
+// Resultado: "300 + 30 Genesis Crystals..."
     response.data.forEach(product => {
      catalogo.innerHTML += `  
    
@@ -78,7 +86,7 @@ const response = await axios.get('/api/Game');
                         <img src="${product.IMG}" alt="Validación de Jugador" style="width: 100%; height: 100%; object-fit: cover;">
                     </div>
                     <h3>${product.name}</h3>
-                    <p>${product.description || 0}</p>
+                    <p>${ cortarPalabras(product.description )|| ""}</p>
                 </article>
 
                 

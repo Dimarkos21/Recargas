@@ -262,6 +262,7 @@ app.use(
         "'self'",
         "data:",
         "blob:",
+        
         "https://static1-es.millenium.gg/articles/7/27/62/7/@/127390-genshinpic004-1620x800-article_cover_bd-1.jpg",
         "https://i.playground.ru/e/ZiVMN8BdZQfIY_mU6dZwNg.jpeg",
         "https://www.uptoplay.net/imagescropped/oxidesurvivalislandicon128.jpgplus.webp",
@@ -290,7 +291,8 @@ app.use(
         "https://th.bing.com",
         "https://www.trazodecoracion.com",
         "https://cdn-icons-png.flaticon.com",
-        "https://www.gstatic.com"
+        "https://www.gstatic.com",
+        "https://media.pocketgamer.biz/images/100661/71731/roblox-500_s470.jpg"
       ],
       "worker-src": [
         "'self'",
@@ -350,7 +352,24 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 
 // --- SERVIR ARCHIVOS OFUSCADOS ---
 app.use('/dist', express.static(path.resolve(__dirname, 'dist')));
-
+// =================================================================
+// 🛡️ FILTRO DE SEGURIDAD: Bloquear acceso a archivos fuente (.js nativos)
+// =================================================================
+// Middleware para bloquear rutas que terminen en index.js
+// Middleware para bloquear rutas que terminen en index.js
+app.use((req, res, next) => {
+    const ruta = req.path.toLowerCase();
+    
+    // Bloquea cualquier ruta que sea exactamente index.js o termine en /index.js
+    if (ruta === '/index.js' || ruta.endsWith('/index.js')) {
+        return res.status(403).json({
+            ok: false,
+            mensaje: 'Acceso prohibido'
+        });
+    }
+    
+    next();
+});
 // --- RUTAS FRONTEND ---
 app.get('/ads.txt', (req, res) => {
     res.send('google.com, pub-9489161591508749, DIRECT, f08c47fec0942fa0');

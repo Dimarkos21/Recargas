@@ -143,7 +143,7 @@ GamesRouter.get("/TotalBilletera", userExtractor, async (request, response) => {
 
 GamesRouter.get("/", async (request, response) => {
     try {
-        const nombresBuscados = ['arena breakout', 'call of duty', "Discord", "genshin impact", "Oxide", "AceCraft", "Asphalt 9"];
+        const nombresBuscados = ['arena breakout', 'call of duty', "Discord", "genshin impact", "Oxide", "AceCraft", "Asphalt 9","Roblox",];
         const regexPattern = new RegExp(nombresBuscados.join('|'), 'i');
 
         const juegos = await GamePrincipal.find({
@@ -459,16 +459,27 @@ GamesRouter.get("/1/:name", async (request, response) => {
         if (!juego) {
             return response.status(404).json({ error: "Juego principal no encontrado" });
         }
-
-        const subcategoria = await GameModel.findOne({ game_principal: juego._id }).lean();
+    
+ let  subcategoria = null;
+if ( externalIdNum === 1042) {
+      subcategoria = await GameModel.findById("6af262cb39b04d88a8ee1c5c").lean();
+} else {
+       subcategoria = await GameModel.findOne({ game_principal: juego._id }).lean();   
+}
+     console.log("SE INICIO")
         if (!subcategoria) {
             return response.status(404).json({ error: "Subcategoría no encontrada" });
         }
 
-        const productos = await Producto_Model.find({
+
+             
+    const productos = await Producto_Model.find({
             category_id: subcategoria.external_id,
-            is_available: true
+            is_available: 
+            true
         }).lean();
+             
+        
 
         if (!productos.length) {
             return response.status(404).json({ error: "No hay productos disponibles" });
