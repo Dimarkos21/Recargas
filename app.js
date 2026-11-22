@@ -145,7 +145,7 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 
 // Controladores
-const obtenerTasaP2P = require("../RecargasJuegos/controllers/P2P");
+
 const usersRouter = require('./controllers/users');
 const loginRouter = require('./controllers/login');
 const todosRouter = require('./controllers/todos');
@@ -172,7 +172,7 @@ const {checkSubscription} = require("./middleware/Mensualida");
 const pedidosRouter = require('./controllers/Pedidos');
 const clientesRouter = require('./controllers/clientes');
 const SucusalesRouter = require('./controllers/sucursales');
-const CajaDiaRouter   = require('./controllers/P2P');
+
 const GamesRouter = require('./controllers/Games'); // Asegúrate de que este archivo exista
 // Nueva ruta  para DeudasTotales
 const DeudasTotalesRouter = require('./controllers/DeudasTotales'); // Asegúrate de que este archivo exista
@@ -442,7 +442,7 @@ app.use('/api/Game', GamesRouter);
 
 // --- RUTAS API BACKEND (PROTEGIDAS) ---
 app.use('/api/presupuesto', userExtractor, checkSubscription, PresupuestoRouter);
-app.use( '/api/CajaDia' ,  userExtractor, checkSubscription, CajaDiaRouter )
+
 app.use( '/api/DeudasTotales' ,  userExtractor, checkSubscription, DeudasTotalesRouter )
 app.use('/api/todos', userExtractor,checkSubscription,auditMiddleware('Pacientes'), todosRouter);
 app.use('/api/productosJuegosRouter',  productosJuegosRouter);
@@ -458,7 +458,7 @@ app.use('/api/pedidos', userExtractor, pedidosRouter, );
 
 
 
-app.get('/api/tasaP2P', obtenerTasaP2P);
+
 // --- FILTRO DE SEGURIDAD (Protección de código fuente) ---
 // Rutas ApI BACKEND ADMIN 
 app.use('/api/negociosControl', userExtractor,    NegociosControlRouter );
